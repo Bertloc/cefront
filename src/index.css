@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: url('https://source.unsplash.com/featured/?water') no-repeat center center fixed;
+  background-size: cover;
+  animation: moveBackground 10s linear infinite;
+}
+
+@keyframes moveBackground {
+  0% {
+      background-position: 0% 0%;
+  }
+  50% {
+      background-position: 50% 50%;
+  }
+  100% {
+      background-position: 100% 100%;
+  }
+}
+
+
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  height: 500px;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.panel {
+  width: 100%;
+  padding: 20px;
+  transition: transform 0.6s ease-in-out;
+}
+
+.panel-login {
+  transform: translateX(0%);
+}
+
+.panel-register {
+  transform: translateX(100%);
+}
+
+.panel.active-login {
+  transform: translateX(-100%);
+}
+
+.panel.active-register {
+  transform: translateX(0%);
+}
+

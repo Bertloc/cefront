@@ -1,0 +1,14 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #f0f4f8;
+  }
+  
+  input::placeholder {
+    color: #9ca3af; /* Placeholder gris claro */
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
