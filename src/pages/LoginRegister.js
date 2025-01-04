@@ -14,7 +14,7 @@ const LoginRegister = () => {
     // Simula el registro (puedes incluir lógica de API aquí)
     console.log("Usuario registrado exitosamente");
     // Redirige al dashboard después del registro
-    navigate("/dashboard");
+    navigate("/upload");
   };
 
   return (
