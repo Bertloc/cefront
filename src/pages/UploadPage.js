@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { VictoryPie, VictoryBar, VictoryLine, VictoryLabel } from "victory";
+import { VictoryPie, VictoryLabel } from "victory";
 
 const UploadPage = () => {
     const [file, setFile] = useState(null);
@@ -31,7 +31,11 @@ const UploadPage = () => {
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
 
-            setClients(response.data.clientes);
+            const sortedClients = response.data.clientes.sort((a, b) => 
+                a["Nombre Solicitante"].localeCompare(b["Nombre Solicitante"])
+            );
+
+            setClients(sortedClients);
             setError("");
         } catch (err) {
             setError("Error al cargar el archivo o procesar los datos.");
@@ -46,10 +50,17 @@ const UploadPage = () => {
         setLoading(true);
 
         try {
-            const response = await axios.get(
-                `http://localhost:5000/api/api/get-client-data/${parseInt(selectedClientId)}`
+            const formData = new FormData();
+            formData.append('file', file); 
+            formData.append('client_id', selectedClientId);
+
+            const complianceResponse = await axios.post(
+                "http://localhost:5000/api/compliance-summary",
+                formData,
+                { headers: { "Content-Type": "multipart/form-data" } }
             );
-            alert(`Cliente seleccionado: ${response.data["Nombre Solicitante"]}`);
+            setComplianceData(Object.entries(complianceResponse.data).map(([key, value]) => ({ x: key, y: value })));
+
         } catch (err) {
             setError("Error al obtener los datos del cliente.");
         } finally {
@@ -86,6 +97,20 @@ const UploadPage = () => {
                             </option>
                         ))}
                     </select>
+                </div>
+            )}
+
+            {/* Gráfico de Cumplimiento General */}
+            {complianceData.length > 0 && (
+                <div className="mt-12">
+                    <h2 className="text-2xl font-bold mb-4">Cumplimiento General</h2>
+                    <VictoryPie
+                        data={complianceData.filter(item => item.y > 0)}
+                        colorScale={['#4CAF50', '#FFC107', '#2196F3', '#F44336']}
+                        labels={({ datum }) => `${datum.x}: ${datum.y}`}
+                        labelComponent={<VictoryLabel angle={45} style={{ fontSize: 12 }} />}
+                        padding={{ top: 20, bottom: 80, left: 80, right: 80 }}
+                    />
                 </div>
             )}
 
