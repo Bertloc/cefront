@@ -5,6 +5,7 @@ import CompliancePieChart from "../components/CompliancePie";
 import DailyTrendLineChart from "../components/DailyTrendLine";
 import MonthlyProductAllocationBarChart from "../components/MonthlyProductAllocationBarChart";
 import ReportDeliveryTrendsBarChart from "../components/ReportDeliveryTrendsBarChart";
+import DeliveryReportBarChart from "../components/DeliveryReportBarChart";
 
 const UploadPage = () => {
     const [file, setFile] = useState(null);
@@ -13,6 +14,7 @@ const UploadPage = () => {
     const [dailyTrendData, setDailyTrendData] = useState([]);
     const [monthlyProductData, setMonthlyProductData] = useState([]);
     const [reportDeliveryData, setReportDeliveryData] = useState([]);
+    const [deliveryReportData, setDeliveryReportData] = useState([]);
     const [error, setError] = useState("");
     const [clientId, setClientId] = useState(null);
     const [clients, setClients] = useState([]);
@@ -94,6 +96,17 @@ const UploadPage = () => {
                 }))
             );
 
+            const deliveryReportResponse = await axios.post(
+                "http://localhost:5000/api/api/delivery-report",
+                formData
+            );
+            setDeliveryReportData(
+                deliveryReportResponse.data.map(entry => ({
+                    Material: entry["Material"],
+                    "Cantidad entrega": entry["Cantidad entrega"]
+                }))
+            );
+
         } catch (err) {
             setError("Error al obtener los datos.");
         } finally {
@@ -132,6 +145,7 @@ const UploadPage = () => {
             {dailyTrendData.length > 0 && <DailyTrendLineChart data={dailyTrendData} />}
             {monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={monthlyProductData} />}
             {reportDeliveryData.length > 0 && <ReportDeliveryTrendsBarChart data={reportDeliveryData} />}
+            {deliveryReportData.length > 0 && <DeliveryReportBarChart data={deliveryReportData} />}
         </div>
     );
 };
