@@ -4,6 +4,7 @@ import axios from "axios";
 import CompliancePieChart from "../components/CompliancePie";
 import DailyTrendLineChart from "../components/DailyTrendLine";
 import MonthlyProductAllocationBarChart from "../components/MonthlyProductAllocationBarChart";
+import ReportDeliveryTrendsBarChart from "../components/ReportDeliveryTrendsBarChart";
 
 const UploadPage = () => {
     const [file, setFile] = useState(null);
@@ -11,6 +12,7 @@ const UploadPage = () => {
     const [complianceData, setComplianceData] = useState([]);
     const [dailyTrendData, setDailyTrendData] = useState([]);
     const [monthlyProductData, setMonthlyProductData] = useState([]);
+    const [reportDeliveryData, setReportDeliveryData] = useState([]);
     const [error, setError] = useState("");
     const [clientId, setClientId] = useState(null);
     const [clients, setClients] = useState([]);
@@ -81,6 +83,17 @@ const UploadPage = () => {
                 monthlyProductResponse.data.map(entry => ({ Mes: entry["Mes"], Cantidad: entry["Cantida Pedido"] }))
             );
 
+            const reportDeliveryResponse = await axios.post(
+                "http://localhost:5000/api/api/report-delivery-trends",
+                formData
+            );
+            setReportDeliveryData(
+                reportDeliveryResponse.data.map(entry => ({
+                    "Fecha Entrega": entry["Fecha Entrega"],
+                    "Cantidad entrega": entry["Cantidad entrega"]
+                }))
+            );
+
         } catch (err) {
             setError("Error al obtener los datos.");
         } finally {
@@ -115,17 +128,10 @@ const UploadPage = () => {
             )}
 
             {/* Gráficos modularizados */}
-            {complianceData.length > 0 && (
-                <CompliancePieChart data={complianceData} />
-            )}
-            
-            {dailyTrendData.length > 0 && (
-                <DailyTrendLineChart data={dailyTrendData} />
-            )}
-
-            {monthlyProductData.length > 0 && (
-                <MonthlyProductAllocationBarChart data={monthlyProductData} />
-            )}
+            {complianceData.length > 0 && <CompliancePieChart data={complianceData} />}
+            {dailyTrendData.length > 0 && <DailyTrendLineChart data={dailyTrendData} />}
+            {monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={monthlyProductData} />}
+            {reportDeliveryData.length > 0 && <ReportDeliveryTrendsBarChart data={reportDeliveryData} />}
         </div>
     );
 };
