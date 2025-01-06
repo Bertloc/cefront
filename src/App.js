@@ -3,6 +3,9 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import LoginRegister from "./pages/LoginRegister";
 import UploadPage from "./pages/UploadPage";
+import CompliancePie from "./components/CompliancePie";
+import DailyTrendLine from "./components/DailyTrendLine";
+import MonthlyProductAllocationBarChart from "./components/MonthlyProductAllocationBarChart";
 
 const App = () => {
   return (
@@ -11,6 +14,9 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginRegister />} />
         <Route path="/upload" element={<UploadPage />} />
+        <Route path="/compliancepie" element={<CompliancePie />} />
+        <Route path="/dailytrendline" element={<DailyTrendLine />} />
+        <Route path="/monthly-product-allocation" element={<MonthlyProductAllocationBarChart />} />
       </Routes>
     </div>
   );
