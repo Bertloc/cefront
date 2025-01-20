@@ -29,6 +29,8 @@ const UploadPage = () => {
     const [clientId, setClientId] = useState(null);
     const [clients, setClients] = useState([]);
 
+    const baseUrl = "https://backend-processing.onrender.com/api";
+
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
     };
@@ -44,7 +46,7 @@ const UploadPage = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:5000/api/upload", formData);
+            const response = await axios.post(`${baseUrl}/upload`, formData);
             const sortedClients = response.data.clientes.sort((a, b) =>
                 a["Nombre Solicitante"].localeCompare(b["Nombre Solicitante"])
             );
@@ -67,16 +69,16 @@ const UploadPage = () => {
             formData.append("client_id", selectedClientId);
 
             const responses = await Promise.all([
-                axios.post("http://localhost:5000/api/compliance-summary", formData),
-                axios.post("http://localhost:5000/api/api/daily-trend", formData),
-                axios.post("http://localhost:5000/api/api/monthly-product-allocation", formData),
-                axios.post("http://localhost:5000/api/api/distribution-by-center", formData),
-                axios.post("http://localhost:5000/api/api/daily-summary", formData),
-                axios.post("http://localhost:5000/api/api/pending-orders", formData),
-                axios.post("http://localhost:5000/api/api/product-category-summary", formData),
-                axios.post("http://localhost:5000/api/api/daily-delivery-report", formData),
-                axios.post("http://localhost:5000/api/api/report-delivery-trends", formData),
-                axios.post("http://localhost:5000/api/api/delivery-report", formData)
+                axios.post(`${baseUrl}/compliance-summary`, formData),
+                axios.post(`${baseUrl}/api/daily-trend`, formData),
+                axios.post(`${baseUrl}/api/monthly-product-allocation`, formData),
+                axios.post(`${baseUrl}/api/distribution-by-center`, formData),
+                axios.post(`${baseUrl}/api/daily-summary`, formData),
+                axios.post(`${baseUrl}/api/pending-orders`, formData),
+                axios.post(`${baseUrl}/api/product-category-summary`, formData),
+                axios.post(`${baseUrl}/api/daily-delivery-report`, formData),
+                axios.post(`${baseUrl}/api/report-delivery-trends`, formData),
+                axios.post(`${baseUrl}/api/delivery-report`, formData)
             ]);
 
             setComplianceData(Object.entries(responses[0].data).map(([key, value]) => ({ id: key, label: key, value })));
@@ -97,7 +99,7 @@ const UploadPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-8">
+        <div className="min-h-screen flex flex-col items-center bg-gray-100 p-8">
             <h1 className="text-3xl font-bold mb-6">Carga de Archivo y Selección de Clientes</h1>
 
             <input type="file" onChange={handleFileChange} className="p-2 border rounded mb-4" />
@@ -118,16 +120,18 @@ const UploadPage = () => {
                 </div>
             )}
 
-            {complianceData.length > 0 && <CompliancePieChart data={complianceData} />}
-            {dailyTrendData.length > 0 && <DailyTrendLineChart data={dailyTrendData} />}
-            {monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={monthlyProductData} />}
-            {distributionByCenterData.length > 0 && <DistributionByCenterPieChart data={distributionByCenterData} />}
-            {dailySummaryData.length > 0 && <DailySummaryLineChart data={dailySummaryData} />}
-            {pendingOrdersData.length > 0 && <PendingOrdersBarChart data={pendingOrdersData} />}
-            {productCategorySummaryData.length > 0 && <ProductCategorySummaryPieChart data={productCategorySummaryData} />}
-            {dailyDeliveryReportData.length > 0 && <DailyDeliveryReportLineChart data={dailyDeliveryReportData} />}
-            {reportDeliveryTrendsData.length > 0 && <ReportDeliveryTrendsLineChart data={reportDeliveryTrendsData} />}
-            {deliveryReportData.length > 0 && <DeliveryReportBarChart data={deliveryReportData} />}
+            <div className="grid grid-cols-2 gap-4 mt-6">
+                {complianceData.length > 0 && <CompliancePieChart data={complianceData} />}
+                {dailyTrendData.length > 0 && <DailyTrendLineChart data={dailyTrendData} />}
+                {monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={monthlyProductData} />}
+                {distributionByCenterData.length > 0 && <DistributionByCenterPieChart data={distributionByCenterData} />}
+                {dailySummaryData.length > 0 && <DailySummaryLineChart data={dailySummaryData} />}
+                {pendingOrdersData.length > 0 && <PendingOrdersBarChart data={pendingOrdersData} />}
+                {productCategorySummaryData.length > 0 && <ProductCategorySummaryPieChart data={productCategorySummaryData} />}
+                {dailyDeliveryReportData.length > 0 && <DailyDeliveryReportLineChart data={dailyDeliveryReportData} />}
+                {reportDeliveryTrendsData.length > 0 && <ReportDeliveryTrendsLineChart data={reportDeliveryTrendsData} />}
+                {deliveryReportData.length > 0 && <DeliveryReportBarChart data={deliveryReportData} />}
+            </div>
         </div>
     );
 };
