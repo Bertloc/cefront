@@ -8,6 +8,7 @@
     "@nivo/heatmap": "^0.88.0",
     "@nivo/line": "^0.88.0",
     "@nivo/pie": "^0.88.0",
+    "axios": "^1.7.9",
     "cra-template": "1.2.0",
     "date-fns": "^4.1.0",
     "react": "^18.2.0",
