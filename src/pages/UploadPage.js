@@ -15,6 +15,11 @@ import DeliveryReportBarChart from "../components/DeliveryReportBarChart";
 const UploadPage = () => {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [clients, setClients] = useState([]);
+    const [clientId, setClientId] = useState(null);
+    const [error, setError] = useState("");
+
+    // Estados de los gráficos
     const [complianceData, setComplianceData] = useState([]);
     const [dailyTrendData, setDailyTrendData] = useState([]);
     const [monthlyProductData, setMonthlyProductData] = useState([]);
@@ -25,9 +30,6 @@ const UploadPage = () => {
     const [dailyDeliveryReportData, setDailyDeliveryReportData] = useState([]);
     const [reportDeliveryTrendsData, setReportDeliveryTrendsData] = useState([]);
     const [deliveryReportData, setDeliveryReportData] = useState([]);
-    const [error, setError] = useState("");
-    const [clientId, setClientId] = useState(null);
-    const [clients, setClients] = useState([]);
 
     const baseUrl = "https://backend-processing.onrender.com/api";
 
@@ -41,9 +43,9 @@ const UploadPage = () => {
             return;
         }
 
+        setLoading(true);
         const formData = new FormData();
         formData.append("file", file);
-        setLoading(true);
 
         try {
             const response = await axios.post(`${baseUrl}/upload`, formData);
@@ -64,35 +66,56 @@ const UploadPage = () => {
         setLoading(true);
 
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("client_id", selectedClientId);
+            // � Ahora solo consultamos los gráficos ya generados en Supabase
+            const response = await axios.get(`${baseUrl}/get-graphics/${selectedClientId}`);
 
-            const responses = await Promise.all([
-                axios.post(`${baseUrl}/compliance-summary`, formData),
-                axios.post(`${baseUrl}/api/daily-trend`, formData),
-                axios.post(`${baseUrl}/api/monthly-product-allocation`, formData),
-                axios.post(`${baseUrl}/api/distribution-by-center`, formData),
-                axios.post(`${baseUrl}/api/daily-summary`, formData),
-                axios.post(`${baseUrl}/api/pending-orders`, formData),
-                axios.post(`${baseUrl}/api/product-category-summary`, formData),
-                axios.post(`${baseUrl}/api/daily-delivery-report`, formData),
-                axios.post(`${baseUrl}/api/report-delivery-trends`, formData),
-                axios.post(`${baseUrl}/api/delivery-report`, formData)
-            ]);
+            const graphics = response.data;
+            if (!graphics.length) {
+                setError("Aún no hay gráficos generados para este cliente.");
+                setLoading(false);
+                return;
+            }
 
-            setComplianceData(Object.entries(responses[0].data).map(([key, value]) => ({ id: key, label: key, value })));
-            setDailyTrendData(responses[1].data.map(entry => ({ x: entry["Fecha Entrega"], y: entry["Cantidad entrega"] })));
-            setMonthlyProductData(responses[2].data.map(entry => ({ Mes: entry["Mes"], Cantidad: entry["Cantida Pedido"] })));
-            setDistributionByCenterData(responses[3].data.map(entry => ({ id: entry["Centro"], label: entry["Centro"], value: entry["Cantidad entrega"] })));
-            setDailySummaryData(responses[4].data.map(entry => ({ x: entry["Fecha Entrega"], y: entry["Cantidad entrega"] })));
-            setPendingOrdersData(responses[5].data.map(entry => ({ id: entry["Material"], label: entry["Material"], value: entry["Cantidad confirmada"] })));
-            setProductCategorySummaryData(responses[6].data.map(entry => ({ id: entry["Texto breve de material"], label: entry["Texto breve de material"], value: entry["Cantida Pedido"] })));
-            setDailyDeliveryReportData(responses[7].data.map(entry => ({ x: entry["Fecha"], y: entry["Total Entregado"] })));
-            setReportDeliveryTrendsData(responses[8].data.map(entry => ({ x: entry["Fecha Entrega"], y: entry["Cantidad entrega"] })));
-            setDeliveryReportData(responses[9].data.map(entry => ({ x: entry["Fecha Entrega"], y: entry["Cantidad entrega"] })));
+            // Asignar datos a los gráficos correctos
+            graphics.forEach(graph => {
+                switch (graph.tipo_grafico) {
+                    case "cumplimiento":
+                        setComplianceData(Object.entries(graph.datos).map(([key, value]) => ({ id: key, label: key, value })));
+                        break;
+                    case "tendencia_diaria":
+                        setDailyTrendData(graph.datos.fecha.map((date, index) => ({ x: date, y: graph.datos.cantidad[index] })));
+                        break;
+                    case "asignacion_mensual":
+                        setMonthlyProductData(graph.datos.map(entry => ({ Mes: entry.Mes, Cantidad: entry.Cantidad })));
+                        break;
+                    case "distribucion_centro":
+                        setDistributionByCenterData(graph.datos.map(entry => ({ id: entry.Centro, label: entry.Centro, value: entry.CantidadEntrega })));
+                        break;
+                    case "resumen_diario":
+                        setDailySummaryData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.CantidadEntrega })));
+                        break;
+                    case "pedidos_pendientes":
+                        setPendingOrdersData(graph.datos.map(entry => ({ id: entry.Material, label: entry.Material, value: entry.CantidadConfirmada })));
+                        break;
+                    case "categoria_producto":
+                        setProductCategorySummaryData(graph.datos.map(entry => ({ id: entry.Producto, label: entry.Producto, value: entry.Cantidad })));
+                        break;
+                    case "reporte_entrega":
+                        setDailyDeliveryReportData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.TotalEntregado })));
+                        break;
+                    case "tendencia_entrega":
+                        setReportDeliveryTrendsData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.Cantidad })));
+                        break;
+                    case "reporte_final":
+                        setDeliveryReportData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.Cantidad })));
+                        break;
+                    default:
+                        break;
+                }
+            });
+
         } catch (err) {
-            setError("Error al obtener los datos.");
+            setError("Error al obtener los gráficos.");
         } finally {
             setLoading(false);
         }
