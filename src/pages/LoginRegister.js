@@ -38,13 +38,19 @@ const LoginRegister = () => {
     setError("");
 
     try {
-      const data = await login(username, contraseña);
-      alert(data.mensaje); // Mostrar mensaje de éxito
-      navigate("/upload"); // Redirigir a la página de subida si es correcto
+        const data = await login(username, contraseña);
+
+        // Redirigir según el rol del usuario
+        if (data.role === "admin") {
+            navigate("/upload"); // Página para admins
+        } else {
+            navigate("/cliente/dashboard"); // Página para clientes
+        }
     } catch (err) {
-      setError("Usuario o contraseña incorrectos");
+        setError("Usuario o contraseña incorrectos");
     }
-  };
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
