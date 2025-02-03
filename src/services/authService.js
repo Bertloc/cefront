@@ -2,13 +2,17 @@ import axios from 'axios';
 
 const API_URL = 'https://backend-processing.onrender.com/api';
 
-// Función para registrar un usuario
+// � Función para registrar un usuario
 export const register = async (username, correo, password) => {
     try {
-        const response = await axios.post(`${API_URL}/register`,
-            { username, correo, contraseña: password },
-            { headers: { "Content-Type": "application/json" } }
-        );
+        const response = await axios.post(`${API_URL}/register`, {
+            username,
+            correo,
+            contraseña: password  // ✅ Se usa "contraseña" para coincidir con el backend
+        }, {
+            headers: { "Content-Type": "application/json" }
+        });
+
         return response.data;
     } catch (error) {
         console.error('Error en registro:', error.response?.data || error.message);
@@ -16,29 +20,30 @@ export const register = async (username, correo, password) => {
     }
 };
 
-// Función para iniciar sesión y obtener el rol del usuario
+// � Función para iniciar sesión y obtener el rol del usuario
 export const login = async (username, password) => {
     try {
-        // Hacer la solicitud de login
-        const response = await axios.post(`${API_URL}/login`,
-            { username, contraseña: password },
-            { headers: { "Content-Type": "application/json" } }
-        );
+        // ✅ Asegurar que enviamos "contraseña" (lo que espera el backend)
+        const response = await axios.post(`${API_URL}/login`, {
+            username,
+            contraseña: password  // � Se mantiene "contraseña" para coincidir con el backend
+        }, {
+            headers: { "Content-Type": "application/json" }
+        });
 
-        const userId = response.data.user_id; // Obtener el ID del usuario desde el backend
+        console.log("Respuesta del backend en login:", response.data);  // � Depuración
 
-        if (userId) {
-            // Ahora, obtener el rol del usuario desde el backend
-            const roleResponse = await axios.get(`${API_URL}/get-user-role?user_id=${userId}`);
-            const userRole = roleResponse.data.role;
+        // Extraer información de la respuesta
+        const { usuario, rol } = response.data;
 
-            // Guardar el rol y el ID en localStorage
-            localStorage.setItem("userId", userId);
-            localStorage.setItem("userRole", userRole);
+        if (usuario && rol) {
+            // � Guardar usuario y rol en localStorage
+            localStorage.setItem("username", usuario);
+            localStorage.setItem("userRole", rol);
 
-            return { mensaje: "Inicio de sesión exitoso", role: userRole };
+            return { mensaje: "Inicio de sesión exitoso", usuario, rol };
         } else {
-            throw new Error("Usuario no encontrado");
+            throw new Error("Respuesta del backend inválida");
         }
     } catch (error) {
         console.error('Error en login:', error.response?.data || error.message);

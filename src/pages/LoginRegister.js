@@ -16,7 +16,7 @@ const LoginRegister = () => {
     setError(""); // Resetear error al cambiar entre login y registro
   };
 
-  // 👉 Función para manejar el registro de usuario
+  // � Función para manejar el registro de usuario
   const handleRegister = async (event) => {
     event.preventDefault();
     setError("");
@@ -32,32 +32,37 @@ const LoginRegister = () => {
     }
   };
 
-  // 👉 Función para manejar el inicio de sesión
+  // � Función para manejar el inicio de sesión
   const handleLogin = async (event) => {
     event.preventDefault();
     setError("");
 
     try {
         const data = await login(username, contraseña);
+        console.log("Datos recibidos en el frontend:", data); // � Para depuración
+
+        // Guardar usuario en localStorage
+        localStorage.setItem("userRole", data.rol); // Asegurar que se guarda correctamente
+        localStorage.setItem("username", data.usuario);
 
         // Redirigir según el rol del usuario
-        if (data.role === "admin") {
+        if (data.rol === "admin") {
             navigate("/upload"); // Página para admins
         } else {
-            navigate("/cliente/dashboard"); // Página para clientes
+            navigate("/ClientDashboard"); // Página para clientes (ajústala si es diferente)
         }
     } catch (err) {
+        console.error("Error en el login:", err);
         setError("Usuario o contraseña incorrectos");
     }
-};
-
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="relative w-[800px] h-[500px] bg-white rounded-lg shadow-lg overflow-hidden">
         
         <div className="flex w-full h-full">
-          {/* 🟢 Sección de Login */}
+          {/* � Sección de Login */}
           <div className="w-1/2 flex flex-col items-center justify-center p-8">
             <h2 className="text-3xl font-bold mb-4">Iniciar Sesión</h2>
             {error && <p className="text-red-500 mb-2">{error}</p>} {/* Muestra error si ocurre */}
@@ -72,7 +77,7 @@ const LoginRegister = () => {
             </form>
           </div>
 
-          {/* 🟢 Sección de Registro */}
+          {/* � Sección de Registro */}
           <div className="w-1/2 flex flex-col items-center justify-center p-8">
             <h2 className="text-3xl font-bold mb-4">Regístrate</h2>
             {error && <p className="text-red-500 mb-2">{error}</p>} {/* Muestra error si ocurre */}

@@ -15,7 +15,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginRegister />} />
         <Route path="/upload" element={<UploadPage />} /> {/* Solo para admins */}
-        <Route path="/cliente/dashboard" element={<ClientDashboard />} /> {/* Ruta para clientes */}
+        <Route path="/ClientDashboard" element={<ClientDashboard />} /> {/* Ruta para clientes */}
         <Route path="/compliancepie" element={<CompliancePie />} />
         <Route path="/dailytrendline" element={<DailyTrendLine />} />
         <Route path="/monthly-product-allocation" element={<MonthlyProductAllocationBarChart />} />
