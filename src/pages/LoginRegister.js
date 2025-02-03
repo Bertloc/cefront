@@ -1,32 +1,30 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate para la navegación
+import { useNavigate } from "react-router-dom";
+import SliderPanel from "./SliderPanel"; // Importamos el panel deslizante
 
 const LoginRegister = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const navigate = useNavigate(); // Inicializa el hook de navegación
+  const navigate = useNavigate();
 
   const togglePanel = () => {
     setIsLogin(!isLogin);
   };
 
   const handleRegister = (event) => {
-    event.preventDefault(); // Previene el comportamiento por defecto del formulario
-    // Simula el registro (puedes incluir lógica de API aquí)
+    event.preventDefault();
     console.log("Usuario registrado exitosamente");
-    // Redirige al dashboard después del registro
-    navigate("/upload");
+    setTimeout(() => {
+      navigate("/upload");
+    }, 500);
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="relative w-[800px] h-[500px] bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Contenedor principal */}
-        <div
-          className={`absolute top-0 left-0 w-full h-full flex transition-transform duration-500 ${
-            isLogin ? "" : "-translate-x-1/2"
-          }`}
-        >
-          {/* Sección de login */}
+        
+        {/* Contenedor de Formularios - Siempre Fijo */}
+        <div className="flex w-full h-full">
+          {/* Sección de Login */}
           <div className="w-1/2 flex flex-col items-center justify-center p-8">
             <h2 className="text-3xl font-bold mb-4">Iniciar Sesión</h2>
             <form className="w-full">
@@ -48,7 +46,8 @@ const LoginRegister = () => {
               </button>
             </form>
           </div>
-          {/* Sección de registro */}
+
+          {/* Sección de Registro */}
           <div className="w-1/2 flex flex-col items-center justify-center p-8">
             <h2 className="text-3xl font-bold mb-4">Regístrate</h2>
             <form className="w-full" onSubmit={handleRegister}>
@@ -76,27 +75,9 @@ const LoginRegister = () => {
             </form>
           </div>
         </div>
-        {/* Panel de fondo */}
-        <div
-          className={`absolute top-0 left-0 w-1/2 h-full bg-gradient-to-r from-blue-500 to-blue-700 flex flex-col items-center justify-center text-white transition-transform duration-500 ${
-            isLogin ? "" : "translate-x-full"
-          }`}
-        >
-          <h2 className="text-2xl font-bold mb-4">
-            {isLogin ? "¡Hola, amigo!" : "¡Bienvenido de nuevo!"}
-          </h2>
-          <p className="mb-4">
-            {isLogin
-              ? "¿No tienes una cuenta? Regístrate aquí."
-              : "¿Ya tienes cuenta? Inicia sesión aquí."}
-          </p>
-          <button
-            onClick={togglePanel}
-            className="bg-white text-blue-700 px-6 py-2 rounded shadow hover:bg-gray-100"
-          >
-            {isLogin ? "Regístrate" : "Iniciar Sesión"}
-          </button>
-        </div>
+
+        {/* Panel Deslizante - Se Mueve */}
+        <SliderPanel isLogin={isLogin} togglePanel={togglePanel} />
       </div>
     </div>
   );
