@@ -67,7 +67,7 @@ const UploadPage = () => {
 
         try {
             // � Ahora solo consultamos los gráficos ya generados en Supabase
-            const response = await axios.get(`${baseUrl}/get-graphics/${selectedClientId}`);
+            const response = await axios.get(`${baseUrl}/api/get-graphics/${selectedClientId}`);
 
             const graphics = response.data;
             if (!graphics.length) {
