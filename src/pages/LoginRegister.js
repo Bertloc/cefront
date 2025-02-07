@@ -45,6 +45,7 @@ const LoginRegister = () => {
         localStorage.setItem("userRole", data.rol); // Asegurar que se guarda correctamente
         localStorage.setItem("username", data.usuario);
 
+        
         // Redirigir según el rol del usuario
         if (data.rol === "admin") {
             navigate("/upload"); // Página para admins
