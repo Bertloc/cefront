@@ -48,7 +48,7 @@ const UploadPage = () => {
         formData.append("file", file);
     
         try {
-            const response = await axios.post(`${baseUrl}/api/publish-data`, formData, {
+            const response = await axios.post(`${baseUrl}/api/publish-data`, formData, { withCredentials: true }, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
