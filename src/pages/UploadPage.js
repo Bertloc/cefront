@@ -1,4 +1,3 @@
-// pages/UploadPage.js
 import React, { useState } from "react";
 import axios from "axios";
 import CompliancePieChart from "../components/CompliancePie";
@@ -28,6 +27,9 @@ const UploadPage = () => {
     const [error, setError] = useState("");
     const [clientId, setClientId] = useState(null);
     const [clients, setClients] = useState([]);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [publishSuccess, setPublishSuccess] = useState(false);
+    const [publishMessage, setPublishMessage] = useState("");
 
     const baseUrl = "https://backend-processing.onrender.com/api";
 
@@ -98,6 +100,32 @@ const UploadPage = () => {
         }
     };
 
+    const handlePublish = async () => {
+        if (!file || isPublishing || publishSuccess) return;
+        setIsPublishing(true);
+        setPublishMessage("⏳ Publicando archivo...");
+    
+        const formData = new FormData();
+        formData.append("file", file);
+    
+        try {
+            const response = await axios.post(`${baseUrl}/api/publish-data`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+    
+            if (response.status === 200) {
+                setPublishMessage("✅ Publicación exitosa.");
+            } else {
+                setPublishMessage("❌ Error en la publicación.");
+            }
+        } catch (error) {
+            setPublishMessage("❌ Error al conectar con el servidor.");
+        } finally {
+            setIsPublishing(false);
+        }
+    };
+    
+
     return (
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-8">
             <h1 className="text-3xl font-bold mb-6">Carga de Archivo y Selección de Clientes</h1>
@@ -132,6 +160,15 @@ const UploadPage = () => {
                 {reportDeliveryTrendsData.length > 0 && <ReportDeliveryTrendsLineChart data={reportDeliveryTrendsData} />}
                 {deliveryReportData.length > 0 && <DeliveryReportBarChart data={deliveryReportData} />}
             </div>
+
+            <button 
+                onClick={handlePublish} 
+                className={`px-4 py-2 rounded mt-4 ${!file || isPublishing || publishSuccess ? "bg-gray-400 cursor-not-allowed" : "bg-green-500 text-white"}`} 
+                disabled={!file || isPublishing || publishSuccess}
+            >
+                {isPublishing ? "Publicando archivo..." : publishSuccess ? "Publicación exitosa" : "Publicar"}
+            </button>
+            {publishMessage && <p className="text-green-500 mt-4">{publishMessage}</p>}
         </div>
     );
 };
