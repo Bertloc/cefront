@@ -97,21 +97,63 @@ const UploadPage = () => {
             };
 
             // Obtener datos de cada endpoint
+            const rawComplianceData = await fetchData("compliance-summary", true);
+            const rawDailyTrendData = await fetchData("daily-trend");
+            const rawMonthlyProductData = await fetchData("monthly-product-allocation");
+            const rawDistributionByCenterData = await fetchData("distribution-by-center");
+            const rawDailySummaryData = await fetchData("daily-summary");
+            const rawPendingOrdersData = await fetchData("pending-orders");
+            const rawProductCategoryData = await fetchData("product-category-summary");
+            const rawDailyDeliveryData = await fetchData("daily-delivery-report");
+            const rawReportDeliveryData = await fetchData("report-delivery-trends");
             setChartData({
-                complianceData: await fetchData("compliance-summary", true), // SIN `/api/`
-                dailyTrendData: await fetchData("daily-trend"), // CON `/api/`
-                monthlyProductData: await fetchData("monthly-product-allocation"), // CON `/api/`
-                distributionByCenterData: await fetchData("distribution-by-center"), // CON `/api/`
-                dailySummaryData: await fetchData("daily-summary"), // CON `/api/`
-                pendingOrdersData: await fetchData("pending-orders"), // CON `/api/`
-                productCategorySummaryData: await fetchData("product-category-summary"), // CON `/api/`
-                dailyDeliveryReportData: await fetchData("daily-delivery-report"), // CON `/api/`
-                reportDeliveryTrendsData: await fetchData("report-delivery-trends"), // CON `/api/`
+                complianceData: Object.entries(rawComplianceData).map(([key, value]) => ({
+                    id: key,
+                    label: key,
+                    value: value
+                })),
+                dailyTrendData: rawDailyTrendData.map(entry => ({
+                    x: entry["Fecha Entrega"],  // Convertir "Fecha Entrega" en "x"
+                    y: entry["Cantidad entrega"] // Convertir "Cantidad entrega" en "y"
+                })),
+                monthlyProductData: rawMonthlyProductData.map(entry => ({
+                    Mes: entry.Mes,  // El backend lo devuelve con "Mes"
+                    Material: entry["Texto Breve Material"], // Ajustar clave para incluir el material
+                    Cantidad: entry["Cantida Pedido"] // Ajustar la clave exacta del backend
+                })),
+                distributionByCenterData: rawDistributionByCenterData.map(entry => ({
+                    id: entry["Centro"],   // Convertimos "Centro" en "id"
+                    label: entry["Centro"], // Convertimos "Centro" en "label"
+                    value: entry["Cantidad entrega"] // Convertimos "Cantidad entrega" en "value"
+                })),
+                dailySummaryData: rawDailySummaryData.map(entry => ({
+                    x: entry["Fecha Entrega"],  // Convertimos "Fecha Entrega" en "x"
+                    y: entry["% Aprovechamiento"] // Convertimos "% Aprovechamiento" en "y"
+                })),
+                pendingOrdersData: rawPendingOrdersData.map(entry => ({
+                    id: entry["Material"],   // Convertimos "Material" en "id"
+                    label: entry["Material"], // Convertimos "Material" en "label"
+                    value: entry["Cantidad confirmada"] // Convertimos "Cantidad confirmada" en "value"
+                })),
+                productCategorySummaryData: rawProductCategoryData.map(entry => ({
+                    id: entry["Texto breve de material"],   // Convertimos "Texto breve de material" en "id"
+                    label: entry["Texto breve de material"], // Convertimos "Texto breve de material" en "label"
+                    value: entry["Cantida Pedido"] // Convertimos "Cantida Pedido" en "value"
+                })),
+                dailyDeliveryReportData: rawDailyDeliveryData.map(entry => ({
+                    x: entry["Fecha"],   // Convertimos "Fecha" en "x"
+                    y: entry["Total Entregado"] // Convertimos "Total Entregado" en "y"
+                })),
+                reportDeliveryTrendsData: rawReportDeliveryData.map(entry => ({
+                    x: entry["Fecha Entrega"],   // Convertimos "Fecha Entrega" en "x"
+                    y: entry["Cantidad entrega"] // Convertimos "Cantidad entrega" en "y"
+                })),
                 deliveryReportData: await fetchData("delivery-report") // CON `/api/`
             });
 
         } catch (err) {
             setError("Error al obtener los datos del cliente.");
+
         } finally {
             setLoading(false);
         }
