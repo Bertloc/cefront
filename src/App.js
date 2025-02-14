@@ -15,7 +15,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginRegister />} />
         <Route path="/upload" element={<UploadPage />} /> {/* Solo para admins */}
-        <Route path="/ClientDashboard" element={<ClientDashboard />} /> {/* Ruta para clientes */}
+        <Route path="/ClientDashboard/:solicitante" element={<ClientDashboard />} /> {/* Ahora recibe el ID del cliente */}
         <Route path="/compliancepie" element={<CompliancePie />} />
         <Route path="/dailytrendline" element={<DailyTrendLine />} />
         <Route path="/monthly-product-allocation" element={<MonthlyProductAllocationBarChart />} />
@@ -23,7 +23,5 @@ const App = () => {
     </div>
   );
 };
-
-
 
 export default App;

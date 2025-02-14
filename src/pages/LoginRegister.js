@@ -1,74 +1,66 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { register, login } from "../services/authService"; // Importar funciones de autenticación
+import { login, clientLogin } from "../services/authService"; // Agregar clientLogin
 import SliderPanel from "./SliderPanel";
 
 const LoginRegister = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(true);
   const [username, setUsername] = useState("");
-  const [correo, setCorreo] = useState("");
+  const [clientId, setClientId] = useState("");
   const [contraseña, setContraseña] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const togglePanel = () => {
-    setIsLogin(!isLogin);
-    setError(""); // Resetear error al cambiar entre login y registro
+    setIsAdmin(!isAdmin);
+    setError(""); // Resetear error al cambiar entre login de admin y cliente
   };
 
-  // � Función para manejar el registro de usuario
-  const handleRegister = async (event) => {
+  // Manejar el inicio de sesión del administrador
+  const handleAdminLogin = async (event) => {
     event.preventDefault();
     setError("");
-
     try {
-      const data = await register(username, correo, contraseña);
-      alert(data.mensaje); // Mensaje de éxito
-      setTimeout(() => {
-        navigate("/upload"); // Redirigir a la página de subida
-      }, 500);
+        const data = await login(username, contraseña);
+        localStorage.setItem("userRole", data.rol);
+        localStorage.setItem("username", data.usuario);
+        
+        if (data.rol === "admin") {
+            navigate("/upload");
+        } else {
+            setError("Acceso denegado para este usuario");
+        }
     } catch (err) {
-      setError("Error al registrar usuario");
+        setError("Usuario o contraseña incorrectos");
     }
   };
 
-  // � Función para manejar el inicio de sesión
-  const handleLogin = async (event) => {
+  // Manejar el inicio de sesión del cliente
+  const handleClientLogin = async (event) => {
     event.preventDefault();
     setError("");
-
     try {
-        const data = await login(username, contraseña);
-        console.log("Datos recibidos en el frontend:", data); // � Para depuración
-
-        // Guardar usuario en localStorage
-        localStorage.setItem("userRole", data.rol); // Asegurar que se guarda correctamente
-        localStorage.setItem("username", data.usuario);
-
-        
-        // Redirigir según el rol del usuario
-        if (data.rol === "admin") {
-            navigate("/upload"); // Página para admins
+        const response = await clientLogin(clientId); // Usar clientLogin en lugar de login
+        if (response.success) {
+            navigate(`/ClientDashboard/${clientId}`);
         } else {
-            navigate("/ClientDashboard"); // Página para clientes (ajústala si es diferente)
+            setError("ID de Solicitante no encontrado");
         }
     } catch (err) {
-        console.error("Error en el login:", err);
-        setError("Usuario o contraseña incorrectos");
+        setError("Error al verificar el cliente");
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="relative w-[800px] h-[500px] bg-white rounded-lg shadow-lg overflow-hidden">
-        
         <div className="flex w-full h-full">
-          {/* � Sección de Login */}
+          {/* Sección de Login Admin */}
           <div className="w-1/2 flex flex-col items-center justify-center p-8">
-            <h2 className="text-3xl font-bold mb-4">Iniciar Sesión</h2>
-            {error && <p className="text-red-500 mb-2">{error}</p>} {/* Muestra error si ocurre */}
-            <form className="w-full" onSubmit={handleLogin}>
-              <input type="text" placeholder="Nombre de Usuario" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
+            <h2 className="text-3xl font-bold mb-4">Inicio de Sesión Admin</h2>
+            {error && <p className="text-red-500 mb-2">{error}</p>}
+            <form className="w-full" onSubmit={handleAdminLogin}>
+              <input type="text" placeholder="Usuario" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
                 value={username} onChange={(e) => setUsername(e.target.value)} required />
               <input type="password" placeholder="Contraseña" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
                 value={contraseña} onChange={(e) => setContraseña(e.target.value)} required />
@@ -78,25 +70,21 @@ const LoginRegister = () => {
             </form>
           </div>
 
-          {/* � Sección de Registro */}
+          {/* Sección de Login Cliente */}
           <div className="w-1/2 flex flex-col items-center justify-center p-8">
-            <h2 className="text-3xl font-bold mb-4">Regístrate</h2>
-            {error && <p className="text-red-500 mb-2">{error}</p>} {/* Muestra error si ocurre */}
-            <form className="w-full" onSubmit={handleRegister}>
-              <input type="text" placeholder="Nombre de Usuario" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
-                value={username} onChange={(e) => setUsername(e.target.value)} required />
-              <input type="email" placeholder="Correo Electrónico" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
-                value={correo} onChange={(e) => setCorreo(e.target.value)} required />
-              <input type="password" placeholder="Contraseña" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
-                value={contraseña} onChange={(e) => setContraseña(e.target.value)} required />
+            <h2 className="text-3xl font-bold mb-4">Inicio de Sesión Cliente</h2>
+            {error && <p className="text-red-500 mb-2">{error}</p>}
+            <form className="w-full" onSubmit={handleClientLogin}>
+              <input type="text" placeholder="ID de Solicitante" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
+                value={clientId} onChange={(e) => setClientId(e.target.value)} required />
               <button type="submit" className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
-                Registrarme
+                Iniciar Sesión Cliente
               </button>
             </form>
           </div>
         </div>
 
-        <SliderPanel isLogin={isLogin} togglePanel={togglePanel} />
+        <SliderPanel isLogin={isAdmin} togglePanel={togglePanel} />
       </div>
     </div>
   );

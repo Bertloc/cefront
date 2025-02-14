@@ -1,62 +1,78 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/authService"; // Importar la función de login
+import authService from '../services/authService';
+import '../pages/LoginRegister.css';
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [contraseña, setContraseña] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+    const [isAdmin, setIsAdmin] = useState(true);
+    const [adminCredentials, setAdminCredentials] = useState({ username: '', password: '' });
+    const [clientId, setClientId] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    setError("");
+    const handleAdminLogin = async () => {
+        try {
+            const success = await authService.adminLogin(adminCredentials);
+            if (success) {
+              navigate("/dashboard");
+            } else {
+                setError('Credenciales inválidas para admin.');
+            }
+        } catch (err) {
+            setError('Error en el inicio de sesión.');
+        }
+    };
 
-    try {
-      const data = await login(username, contraseña);
-      alert(data.mensaje); // Mensaje de éxito
+    const handleClientLogin = async () => {
+        try {
+            const exists = await authService.validateClient(clientId);
+            if (exists) {
+              navigate(`/ClientDashboard/${clientId}`);
+            } else {
+                setError('ID de Solicitante no encontrado.');
+            }
+        } catch (err) {
+            setError('Error al verificar el cliente.');
+        }
+    };
 
-      // Guardar usuario en localStorage para mantener la sesión (opcional)
-      localStorage.setItem('user', JSON.stringify(data));
-
-      // Redirigir al dashboard u otra página
-      navigate("/dashboard");
-    } catch (err) {
-      setError("Usuario o contraseña incorrectos");
-    }
-  };
-
-  return (
-    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 min-h-screen flex items-center justify-center">
-      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
-          Iniciar Sesión
-        </h2>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <form className="space-y-4" onSubmit={handleLogin}>
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-600">
-              Usuario
-            </label>
-            <input id="username" type="text" placeholder="Ingresa tu usuario"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={username} onChange={(e) => setUsername(e.target.value)} required />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-600">
-              Contraseña
-            </label>
-            <input id="password" type="password" placeholder="Ingresa tu contraseña"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={contraseña} onChange={(e) => setContraseña(e.target.value)} required />
-          </div>
-          <button type="submit" className="w-full bg-blue-600 text-white py-2 px-4 rounded-md font-semibold hover:bg-blue-700 transition">
-            Iniciar Sesión
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+    return (
+        <div className="login-container">
+            <h2>Iniciar Sesión</h2>
+            <div className="login-toggle">
+                <button className={isAdmin ? "active" : ""} onClick={() => setIsAdmin(true)}>Admin</button>
+                <button className={!isAdmin ? "active" : ""} onClick={() => setIsAdmin(false)}>Cliente</button>
+            </div>
+            {isAdmin ? (
+                <div className="admin-login">
+                    <input 
+                        type="text" 
+                        placeholder="Usuario" 
+                        value={adminCredentials.username} 
+                        onChange={(e) => setAdminCredentials({ ...adminCredentials, username: e.target.value })}
+                    />
+                    <input 
+                        type="password" 
+                        placeholder="Contraseña" 
+                        value={adminCredentials.password} 
+                        onChange={(e) => setAdminCredentials({ ...adminCredentials, password: e.target.value })}
+                    />
+                    <button onClick={handleAdminLogin}>Iniciar Sesión Admin</button>
+                </div>
+            ) : (
+                <div className="client-login">
+                    <input 
+                        type="text" 
+                        placeholder="ID de Solicitante" 
+                        value={clientId} 
+                        onChange={(e) => setClientId(e.target.value)}
+                    />
+                    <button onClick={handleClientLogin}>Iniciar Sesión Cliente</button>
+                </div>
+            )}
+            {error && <p className="error">{error}</p>}
+        </div>
+    );
 };
 
 export default Login;
