@@ -1,8 +1,7 @@
-// pages/UploadPage.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import CompliancePieChart from "../components/CompliancePie";
-import DailyTrendLineChart from "../components/DailyTrendLine";
+import CompliancePie from "../components/CompliancePie";
+import DailyTrendLine from "../components/DailyTrendLine";
 import MonthlyProductAllocationBarChart from "../components/MonthlyProductAllocationBarChart";
 import DistributionByCenterPieChart from "../components/DistributionByCenterPieChart";
 import DailySummaryLineChart from "../components/DailySummaryLineChart";
@@ -15,49 +14,65 @@ import DeliveryReportBarChart from "../components/DeliveryReportBarChart";
 const UploadPage = () => {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [clients, setClients] = useState([]);
-    const [clientId, setClientId] = useState(null);
     const [error, setError] = useState("");
+    const [clientId, setClientId] = useState(null);
+    const [clients, setClients] = useState([]);
+    const [isPublishing, setIsPublishing] = useState(false);
+    const [publishMessage, setPublishMessage] = useState("");
 
-    // Estados de los gráficos
-    const [complianceData, setComplianceData] = useState([]);
-    const [dailyTrendData, setDailyTrendData] = useState([]);
-    const [monthlyProductData, setMonthlyProductData] = useState([]);
-    const [distributionByCenterData, setDistributionByCenterData] = useState([]);
-    const [dailySummaryData, setDailySummaryData] = useState([]);
-    const [pendingOrdersData, setPendingOrdersData] = useState([]);
-    const [productCategorySummaryData, setProductCategorySummaryData] = useState([]);
-    const [dailyDeliveryReportData, setDailyDeliveryReportData] = useState([]);
-    const [reportDeliveryTrendsData, setReportDeliveryTrendsData] = useState([]);
-    const [deliveryReportData, setDeliveryReportData] = useState([]);
+    // Estado unificado para los gráficos
+    const [chartData, setChartData] = useState({
+        complianceData: [],
+        dailyTrendData: [],
+        monthlyProductData: [],
+        distributionByCenterData: [],
+        dailySummaryData: [],
+        pendingOrdersData: [],
+        productCategorySummaryData: [],
+        dailyDeliveryReportData: [],
+        reportDeliveryTrendsData: [],
+        deliveryReportData: []
+    });
 
     const baseUrl = "https://backend-processing.onrender.com/api";
+
+    useEffect(() => {
+        handleFetchClientsFromDB();
+    }, []);
 
     const handleFileChange = (event) => {
         setFile(event.target.files[0]);
     };
 
-    const handleUpload = async () => {
-        if (!file) {
-            setError("Por favor, selecciona un archivo.");
-            return;
-        }
+    const handlePublish = async () => {
+        if (!file || isPublishing) return;
+        setIsPublishing(true);
+        setPublishMessage("⏳ Publicando archivo...");
 
         setLoading(true);
         const formData = new FormData();
         formData.append("file", file);
 
         try {
-            const response = await axios.post(`${baseUrl}/upload`, formData);
-            const sortedClients = response.data.clientes.sort((a, b) =>
-                a["Nombre Solicitante"].localeCompare(b["Nombre Solicitante"])
-            );
-            setClients(sortedClients);
-            setError("");
-        } catch (err) {
-            setError("Error al cargar el archivo.");
+            await axios.post(`${baseUrl}/api/publish-data`, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            setPublishMessage("✅ Publicación exitosa.");
+            await handleFetchClientsFromDB();
+        } catch (error) {
+            setPublishMessage("⚠️ Publicación fallida.");
         } finally {
-            setLoading(false);
+            setIsPublishing(false);
+        }
+    };
+
+    const handleFetchClientsFromDB = async () => {
+        try {
+            const response = await axios.get(`${baseUrl}/api/get-all-clients`); // Verifica si el backend usa `/api/`
+            const sortedClients = response.data.sort((a, b) => a.nombre_solicitante.localeCompare(b.nombre_solicitante));
+            setClients(sortedClients);
+        } catch (err) {
+            setError("Error al obtener la lista de clientes.");
         }
     };
 
@@ -66,56 +81,37 @@ const UploadPage = () => {
         setLoading(true);
 
         try {
-            // � Ahora solo consultamos los gráficos ya generados en Supabase
-            const response = await axios.get(`${baseUrl}/api/get-graphics/${selectedClientId}`);
+            // Función para manejar las solicitudes con axios.get()
+            const fetchData = async (endpoint, isCompliance = false) => {
+                try {
+                    const url = isCompliance 
+                        ? `${baseUrl}/${endpoint}?client_id=${selectedClientId}`  // SIN `/api/`
+                        : `${baseUrl}/api/${endpoint}?client_id=${selectedClientId}`; // CON `/api/`
 
-            const graphics = response.data;
-            if (!graphics.length) {
-                setError("Aún no hay gráficos generados para este cliente.");
-                setLoading(false);
-                return;
-            }
-
-            // Asignar datos a los gráficos correctos
-            graphics.forEach(graph => {
-                switch (graph.tipo_grafico) {
-                    case "cumplimiento":
-                        setComplianceData(Object.entries(graph.datos).map(([key, value]) => ({ id: key, label: key, value })));
-                        break;
-                    case "tendencia_diaria":
-                        setDailyTrendData(graph.datos.fecha.map((date, index) => ({ x: date, y: graph.datos.cantidad[index] })));
-                        break;
-                    case "asignacion_mensual":
-                        setMonthlyProductData(graph.datos.map(entry => ({ Mes: entry.Mes, Cantidad: entry.Cantidad })));
-                        break;
-                    case "distribucion_centro":
-                        setDistributionByCenterData(graph.datos.map(entry => ({ id: entry.Centro, label: entry.Centro, value: entry.CantidadEntrega })));
-                        break;
-                    case "resumen_diario":
-                        setDailySummaryData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.CantidadEntrega })));
-                        break;
-                    case "pedidos_pendientes":
-                        setPendingOrdersData(graph.datos.map(entry => ({ id: entry.Material, label: entry.Material, value: entry.CantidadConfirmada })));
-                        break;
-                    case "categoria_producto":
-                        setProductCategorySummaryData(graph.datos.map(entry => ({ id: entry.Producto, label: entry.Producto, value: entry.Cantidad })));
-                        break;
-                    case "reporte_entrega":
-                        setDailyDeliveryReportData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.TotalEntregado })));
-                        break;
-                    case "tendencia_entrega":
-                        setReportDeliveryTrendsData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.Cantidad })));
-                        break;
-                    case "reporte_final":
-                        setDeliveryReportData(graph.datos.map(entry => ({ x: entry.Fecha, y: entry.Cantidad })));
-                        break;
-                    default:
-                        break;
+                    const response = await axios.get(url);
+                    return response.data;
+                } catch (error) {
+                    console.error(`Error en ${endpoint}:`, error);
+                    return []; // Retorna array vacío en caso de error
                 }
+            };
+
+            // Obtener datos de cada endpoint
+            setChartData({
+                complianceData: await fetchData("compliance-summary", true), // SIN `/api/`
+                dailyTrendData: await fetchData("daily-trend"), // CON `/api/`
+                monthlyProductData: await fetchData("monthly-product-allocation"), // CON `/api/`
+                distributionByCenterData: await fetchData("distribution-by-center"), // CON `/api/`
+                dailySummaryData: await fetchData("daily-summary"), // CON `/api/`
+                pendingOrdersData: await fetchData("pending-orders"), // CON `/api/`
+                productCategorySummaryData: await fetchData("product-category-summary"), // CON `/api/`
+                dailyDeliveryReportData: await fetchData("daily-delivery-report"), // CON `/api/`
+                reportDeliveryTrendsData: await fetchData("report-delivery-trends"), // CON `/api/`
+                deliveryReportData: await fetchData("delivery-report") // CON `/api/`
             });
 
         } catch (err) {
-            setError("Error al obtener los gráficos.");
+            setError("Error al obtener los datos del cliente.");
         } finally {
             setLoading(false);
         }
@@ -126,34 +122,33 @@ const UploadPage = () => {
             <h1 className="text-3xl font-bold mb-6">Carga de Archivo y Selección de Clientes</h1>
 
             <input type="file" onChange={handleFileChange} className="p-2 border rounded mb-4" />
-            <button onClick={handleUpload} className="bg-blue-500 text-white px-4 py-2 rounded">Subir Archivo</button>
+            <button onClick={handlePublish} className="bg-blue-500 text-white px-4 py-2 rounded">Publicar Archivo</button>
 
-            {loading && <div className="mt-4 text-blue-500 font-semibold">Procesando archivo...</div>}
+            {isPublishing && <div className="mt-4 text-blue-500 font-semibold">{publishMessage}</div>}
+            {loading && <div className="mt-4 text-blue-500 font-semibold">Procesando...</div>}
             {error && <p className="text-red-500 mt-4">{error}</p>}
 
             {clients.length > 0 && (
-                <div className="mt-6">
-                    <h2 className="text-2xl font-bold mb-4">Seleccionar Cliente</h2>
-                    <select onChange={(e) => handleClientSelect(e.target.value)} className="p-2 border rounded">
-                        <option value="">Selecciona un cliente</option>
-                        {clients.map(client => (
-                            <option key={client.Solicitante} value={client.Solicitante}>{client["Nombre Solicitante"]}</option>
-                        ))}
-                    </select>
-                </div>
+                <select onChange={(e) => handleClientSelect(e.target.value)} className="p-2 border rounded">
+                    <option value="">Selecciona un cliente</option>
+                    {clients.map(client => (
+                        <option key={client.solicitante} value={client.solicitante}>{client.nombre_solicitante}</option>
+                    ))}
+                </select>
             )}
 
-            <div className="grid grid-cols-2 gap-4 mt-6">
-                {complianceData.length > 0 && <CompliancePieChart data={complianceData} />}
-                {dailyTrendData.length > 0 && <DailyTrendLineChart data={dailyTrendData} />}
-                {monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={monthlyProductData} />}
-                {distributionByCenterData.length > 0 && <DistributionByCenterPieChart data={distributionByCenterData} />}
-                {dailySummaryData.length > 0 && <DailySummaryLineChart data={dailySummaryData} />}
-                {pendingOrdersData.length > 0 && <PendingOrdersBarChart data={pendingOrdersData} />}
-                {productCategorySummaryData.length > 0 && <ProductCategorySummaryPieChart data={productCategorySummaryData} />}
-                {dailyDeliveryReportData.length > 0 && <DailyDeliveryReportLineChart data={dailyDeliveryReportData} />}
-                {reportDeliveryTrendsData.length > 0 && <ReportDeliveryTrendsLineChart data={reportDeliveryTrendsData} />}
-                {deliveryReportData.length > 0 && <DeliveryReportBarChart data={deliveryReportData} />}
+            {/* Renderización de los gráficos solo si hay datos disponibles */}
+            <div className="grid grid-cols-2 gap-6 mt-8">
+                {chartData.complianceData.length > 0 && <CompliancePie data={chartData.complianceData} />}
+                {chartData.dailyTrendData.length > 0 && <DailyTrendLine data={chartData.dailyTrendData} />}
+                {chartData.monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />}
+                {chartData.distributionByCenterData.length > 0 && <DistributionByCenterPieChart data={chartData.distributionByCenterData} />}
+                {chartData.dailySummaryData.length > 0 && <DailySummaryLineChart data={chartData.dailySummaryData} />}
+                {chartData.pendingOrdersData.length > 0 && <PendingOrdersBarChart data={chartData.pendingOrdersData} />}
+                {chartData.productCategorySummaryData.length > 0 && <ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />}
+                {chartData.dailyDeliveryReportData.length > 0 && <DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />}
+                {chartData.reportDeliveryTrendsData.length > 0 && <ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />}
+                {chartData.deliveryReportData.length > 0 && <DeliveryReportBarChart data={chartData.deliveryReportData} />}
             </div>
         </div>
     );
