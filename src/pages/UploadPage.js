@@ -76,6 +76,9 @@ const UploadPage = () => {
         }
     };
 
+
+
+    
     const handleClientSelect = async (selectedClientId) => {
         setClientId(selectedClientId);
         setLoading(true);
