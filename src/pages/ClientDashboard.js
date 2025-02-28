@@ -59,7 +59,7 @@ const ClientDashboard = () => {
             };
 
             // Obtener datos de cada endpoint
-            const rawComplianceData = await fetchData("compliance-summary", true);
+            const rawComplianceData = await fetchData("/api/compliance-summary", true);
             const rawDailyTrendData = await fetchData("api/daily-trend");
             const rawMonthlyProductData = await fetchData("api/monthly-product-allocation");
             const rawDistributionByCenterData = await fetchData("api/distribution-by-center");
