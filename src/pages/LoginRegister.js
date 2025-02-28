@@ -39,15 +39,26 @@ const LoginRegister = () => {
   const handleClientLogin = async (event) => {
     event.preventDefault();
     setError("");
+    
+    const sanitizedClientId = clientId.trim(); // Eliminar espacios en blanco
+    
+    if (sanitizedClientId === "") {
+      setError("El ID de Solicitante no puede estar vacío");
+      return;
+    }
+
     try {
-        const response = await clientLogin(clientId); // Usar clientLogin en lugar de login
+        const response = await clientLogin(sanitizedClientId); // Enviar clientId sin espacios extra
+        console.log("Respuesta del backend:", response); // Debugging
+
         if (response.success) {
-            navigate(`/ClientDashboard/${clientId}`);
+            navigate(`/ClientDashboard/${sanitizedClientId}`);
         } else {
             setError("ID de Solicitante no encontrado");
         }
     } catch (err) {
-        setError("Error al verificar el cliente");
+        console.error("Error en la autenticación:", err.response?.data || err.message);
+        setError(err.response?.data?.message || "Error al verificar el cliente");
     }
   };
 
@@ -75,9 +86,19 @@ const LoginRegister = () => {
             <h2 className="text-3xl font-bold mb-4">Inicio de Sesión Cliente</h2>
             {error && <p className="text-red-500 mb-2">{error}</p>}
             <form className="w-full" onSubmit={handleClientLogin}>
-              <input type="text" placeholder="ID de Solicitante" className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
-                value={clientId} onChange={(e) => setClientId(e.target.value)} required />
-              <button type="submit" className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">
+              <input 
+                type="text" 
+                placeholder="ID de Solicitante" 
+                className="w-full mb-4 px-4 py-2 border border-gray-300 rounded"
+                value={clientId} 
+                onChange={(e) => setClientId(e.target.value)} 
+                required 
+              />
+              <button 
+                type="submit" 
+                className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+                disabled={clientId.trim() === ""} // Botón deshabilitado si clientId está vacío
+              >
                 Iniciar Sesión Cliente
               </button>
             </form>

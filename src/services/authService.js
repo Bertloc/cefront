@@ -36,7 +36,7 @@ export const login = async (username, password) => {
 // ✅ Nueva función para iniciar sesión como cliente usando el ID de Solicitante
 export const clientLogin = async (clientId) => {
     try {
-        const response = await axios.post(`${API_URL}/client-login`, { clientId }, {
+        const response = await axios.post(`${API_URL}/api/client-login`, { clientId }, {
             headers: { "Content-Type": "application/json" }
         });
 
