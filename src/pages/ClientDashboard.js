@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import CompliancePie from "../components/CompliancePie";
@@ -15,12 +15,9 @@ import DeliveryReportBarChart from "../components/DeliveryReportBarChart";
 const API_URL = "https://backend-processing.onrender.com/api";
 
 const ClientDashboard = () => {
-    const { clientId } = useParams();  // Obtiene el clientId desde la URL
-    const [clientData, setClientData] = useState(null);
-    const [error, setError] = useState("");
+    const { clientId } = useParams();
     const [loading, setLoading] = useState(true);
-
-    // Estado para los gráficos
+    const [error, setError] = useState("");
     const [chartData, setChartData] = useState({
         complianceData: [],
         dailyTrendData: [],
@@ -36,47 +33,42 @@ const ClientDashboard = () => {
 
     useEffect(() => {
         if (clientId) {
-            fetchClientData();
+            console.log(`📌 clientId recibido: ${clientId}`);
             fetchAllChartData();
+        } else {
+            console.warn("⚠️ clientId no está definido aún.");
         }
     }, [clientId]);
-
-    const fetchClientData = async () => {
-        try {
-            const response = await axios.get(`${API_URL}/api/get-client-orders/${clientId}`);
-            setClientData(response.data);
-        } catch (err) {
-            setError("No se encontraron datos para este cliente.");
-        }
-    };
 
     const fetchAllChartData = async () => {
         setLoading(true);
         try {
             const fetchData = async (endpoint, isCompliance = false) => {
                 try {
-                    const url = isCompliance
-                        ? `${API_URL}/${endpoint}?client_id=${clientId}`  // SIN `/api/`
-                        : `${API_URL}/api/${endpoint}?client_id=${clientId}`; // CON `/api/`
+                    const url = isCompliance 
+                        ? `${API_URL.replace('/api', '')}/${endpoint}?client_id=${clientId}` // `compliance-summary` sin `/api/`
+                        : `${API_URL}/${endpoint}?client_id=${clientId}`; // Todos los demás con `/api/`
+                    console.log(`🔍 Solicitando: ${url}`);
                     const response = await axios.get(url);
+                    console.log(`✅ Respuesta de ${endpoint}:`, response.data);
                     return response.data;
                 } catch (error) {
-                    console.error(`Error en ${endpoint}:`, error);
+                    console.error(`❌ Error en ${endpoint}:`, error);
                     return [];
                 }
             };
 
             // Obtener datos de cada endpoint
             const rawComplianceData = await fetchData("compliance-summary", true);
-            const rawDailyTrendData = await fetchData("daily-trend");
-            const rawMonthlyProductData = await fetchData("monthly-product-allocation");
-            const rawDistributionByCenterData = await fetchData("distribution-by-center");
-            const rawDailySummaryData = await fetchData("daily-summary");
-            const rawPendingOrdersData = await fetchData("pending-orders");
-            const rawProductCategoryData = await fetchData("product-category-summary");
-            const rawDailyDeliveryData = await fetchData("daily-delivery-report");
-            const rawReportDeliveryData = await fetchData("report-delivery-trends");
-            const rawDeliveryReportData = await fetchData("delivery-report");
+            const rawDailyTrendData = await fetchData("api/daily-trend");
+            const rawMonthlyProductData = await fetchData("api/monthly-product-allocation");
+            const rawDistributionByCenterData = await fetchData("api/distribution-by-center");
+            const rawDailySummaryData = await fetchData("api/daily-summary");
+            const rawPendingOrdersData = await fetchData("api/pending-orders");
+            const rawProductCategoryData = await fetchData("api/product-category-summary");
+            const rawDailyDeliveryData = await fetchData("api/daily-delivery-report");
+            const rawReportDeliveryData = await fetchData("api/report-delivery-trends");
+            const rawDeliveryReportData = await fetchData("api/delivery-report");
 
             setChartData({
                 complianceData: Object.entries(rawComplianceData).map(([key, value]) => ({
@@ -124,7 +116,7 @@ const ClientDashboard = () => {
             });
 
         } catch (err) {
-            setError("Error al obtener los datos del cliente.");
+            setError("❌ Error al obtener los datos del cliente.");
         } finally {
             setLoading(false);
         }
@@ -134,30 +126,24 @@ const ClientDashboard = () => {
         <div className="min-h-screen flex flex-col items-center bg-gray-100 p-8">
             <h1 className="text-3xl font-bold mb-6">Dashboard del Cliente</h1>
 
-            {error && <p className="text-red-500">{error}</p>}
-            {loading && <p className="text-blue-500 font-semibold">Cargando datos...</p>}
-
-            {clientData && (
-                <div className="mb-6">
-                    <h2 className="text-2xl font-semibold">ID de Cliente: {clientId}</h2>
-                    <p className="text-lg">Nombre del Cliente: {clientData[0]?.nombre_solicitante || "Desconocido"}</p>
-                    <p className="text-lg">Tienes {clientData.length} pedidos registrados.</p>
+            {loading ? (
+                <p className="text-blue-500">Cargando datos...</p>
+            ) : error ? (
+                <p className="text-red-500">{error}</p>
+            ) : (
+                <div className="grid grid-cols-2 gap-6 mt-8">
+                    {chartData.complianceData.length > 0 && <CompliancePie data={chartData.complianceData} />}
+                    {chartData.dailyTrendData.length > 0 && <DailyTrendLine data={chartData.dailyTrendData} />}
+                    {chartData.monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />}
+                    {chartData.distributionByCenterData.length > 0 && <DistributionByCenterPieChart data={chartData.distributionByCenterData} />}
+                    {chartData.dailySummaryData.length > 0 && <DailySummaryLineChart data={chartData.dailySummaryData} />}
+                    {chartData.pendingOrdersData.length > 0 && <PendingOrdersBarChart data={chartData.pendingOrdersData} />}
+                    {chartData.productCategorySummaryData.length > 0 && <ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />}
+                    {chartData.dailyDeliveryReportData.length > 0 && <DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />}
+                    {chartData.reportDeliveryTrendsData.length > 0 && <ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />}
+                    {chartData.deliveryReportData.length > 0 && <DeliveryReportBarChart data={chartData.deliveryReportData} />}
                 </div>
             )}
-
-            {/* Renderización de los gráficos solo si hay datos disponibles */}
-            <div className="grid grid-cols-2 gap-6 mt-8">
-                {chartData.complianceData.length > 0 && <CompliancePie data={chartData.complianceData} />}
-                {chartData.dailyTrendData.length > 0 && <DailyTrendLine data={chartData.dailyTrendData} />}
-                {chartData.monthlyProductData.length > 0 && <MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />}
-                {chartData.distributionByCenterData.length > 0 && <DistributionByCenterPieChart data={chartData.distributionByCenterData} />}
-                {chartData.dailySummaryData.length > 0 && <DailySummaryLineChart data={chartData.dailySummaryData} />}
-                {chartData.pendingOrdersData.length > 0 && <PendingOrdersBarChart data={chartData.pendingOrdersData} />}
-                {chartData.productCategorySummaryData.length > 0 && <ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />}
-                {chartData.dailyDeliveryReportData.length > 0 && <DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />}
-                {chartData.reportDeliveryTrendsData.length > 0 && <ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />}
-                {chartData.deliveryReportData.length > 0 && <DeliveryReportBarChart data={chartData.deliveryReportData} />}
-            </div>
         </div>
     );
 };
