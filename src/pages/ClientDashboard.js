@@ -28,7 +28,7 @@ const ClientDashboard = () => {
     const [chartData, setChartData] = useState({
         complianceData: [],
         dailyTrendData: [],
-        monthlyProductData: [],
+        // monthlyProductData: [],
         distributionByCenterData: [],
         dailySummaryData: [],
         pendingOrdersData: [],
@@ -37,6 +37,7 @@ const ClientDashboard = () => {
         reportDeliveryTrendsData: [],
         deliveryReportData: []
     });
+
 
     useEffect(() => {
         if (clientId) {
@@ -47,11 +48,12 @@ const ClientDashboard = () => {
 
     const fetchClientName = async () => {
         try {
-            const response = await axios.get(`${API_URL}/get-client-orders/${clientId}`);
+            const response = await axios.get(`${API_URL}/api/get-client-orders/${clientId}`);
             if (response.data && response.data.length > 0) {
-                const nombre = response.data[0].nombre_solicitante || "Cliente";
-                setClientName(nombre);
-                setColorTheme(getClientColor(nombre));
+            const match = response.data.find(item => String(item.solicitante) === String(clientId));
+            const nombre = match?.nombre_solicitante || "Cliente";
+            setClientName(nombre);
+            setColorTheme(getClientColor(nombre));
             }
         } catch (err) {
             console.error("Error al obtener el nombre del cliente:", err);
@@ -160,7 +162,21 @@ const ClientDashboard = () => {
     }[colorTheme];
 
     return (
-        <div className="min-h-screen bg-gray-100 py-8 px-4 flex flex-col justify-between">
+  <>
+  
+    <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl shadow mb-6">
+      <div className="flex items-center gap-4">
+        <UserCircle size={40} className="text-blue-600" />
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-800">
+            {clientName || "Cliente"}
+          </h1>
+          <p className="text-sm text-gray-500">Dashboard de entregas</p>
+        </div>
+      </div>
+    </div>
+
+<div className="min-h-screen bg-gray-100 py-8 px-4 flex flex-col justify-between">
             <div>
                 <div className="text-center mb-6">
                     <h1 className="text-2xl sm:text-3xl font-bold flex justify-center items-center gap-2">
@@ -228,65 +244,69 @@ const ClientDashboard = () => {
                     <div className="space-y-10 px-4">
                         <div>
                             <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-blue-600">
-                                <LineChart className="w-5 h-5" /> Cumplimiento
+                                 <LineChart className="w-5 h-5" /> Cumplimiento
                             </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <div ref={(el) => chartRefs.current[0] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <CompliancePie data={chartData.complianceData} />
-                                </div>
-                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6 auto-rows-auto">
+                            <div ref={(el) => chartRefs.current[0] = el} className="bg-white p-4 rounded-xl shadow">
+                            <CompliancePie data={chartData.complianceData} />
                         </div>
+                        </div>
+                    </div>
 
-                        <div>
-                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-emerald-600">
-                                <LineChart className="w-5 h-5" /> Tendencias y Entregas
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <div ref={(el) => chartRefs.current[1] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <DailyTrendLine data={chartData.dailyTrendData} />
-                                </div>
-                                <div ref={(el) => chartRefs.current[2] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />
-                                </div>
-                                <div ref={(el) => chartRefs.current[8] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />
-                                </div>
-                                <div ref={(el) => chartRefs.current[7] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />
-                                </div>
-                            </div>
-                        </div>
 
-                        <div>
-                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-pink-600">
-                                <LineChart className="w-5 h-5" /> Distribución y Categorías
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <div ref={(el) => chartRefs.current[3] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <DistributionByCenterPieChart data={chartData.distributionByCenterData} />
-                                </div>
-                                <div ref={(el) => chartRefs.current[6] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />
-                                </div>
-                            </div>
-                        </div>
+                    <div>
+  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-emerald-600">
+    <LineChart className="w-5 h-5" /> Tendencias y Entregas
+  </h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6 auto-rows-auto">
+    <div ref={(el) => chartRefs.current[1] = el} className="bg-white p-4 rounded-xl shadow">
+      <DailyTrendLine data={chartData.dailyTrendData} />
+    </div>
+    <div ref={(el) => chartRefs.current[2] = el} className="bg-white p-4 rounded-xl shadow">
+      <MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />
+    </div>
+    <div ref={(el) => chartRefs.current[8] = el} className="bg-white p-4 rounded-xl shadow">
+      <ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />
+    </div>
+    <div ref={(el) => chartRefs.current[7] = el} className="bg-white p-4 rounded-xl shadow">
+      <DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />
+    </div>
+  </div>
+</div>
 
-                        <div>
-                            <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-orange-600">
-                                <LineChart className="w-5 h-5" /> Resúmenes y Pedidos Pendientes
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <div ref={(el) => chartRefs.current[4] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <DailySummaryLineChart data={chartData.dailySummaryData} />
-                                </div>
-                                <div ref={(el) => chartRefs.current[5] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <PendingOrdersBarChart data={chartData.pendingOrdersData} />
-                                </div>
-                                <div ref={(el) => chartRefs.current[9] = el} className="bg-white p-4 rounded-xl shadow">
-                                    <DeliveryReportBarChart data={chartData.deliveryReportData} />
-                                </div>
-                            </div>
-                        </div>
+
+<div>
+  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-pink-600">
+    <LineChart className="w-5 h-5" /> Distribución y Categorías
+  </h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6 auto-rows-auto">
+    <div ref={(el) => chartRefs.current[3] = el} className="bg-white p-4 rounded-xl shadow">
+      <DistributionByCenterPieChart data={chartData.distributionByCenterData} />
+    </div>
+    <div ref={(el) => chartRefs.current[6] = el} className="bg-white p-4 rounded-xl shadow">
+      <ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />
+    </div>
+  </div>
+</div>
+
+
+<div>
+  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-orange-600">
+    <LineChart className="w-5 h-5" /> Resúmenes y Pedidos Pendientes
+  </h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6 auto-rows-auto">
+    <div ref={(el) => chartRefs.current[4] = el} className="bg-white p-4 rounded-xl shadow">
+      <DailySummaryLineChart data={chartData.dailySummaryData} />
+    </div>
+    <div ref={(el) => chartRefs.current[5] = el} className="bg-white p-4 rounded-xl shadow">
+      <PendingOrdersBarChart data={chartData.pendingOrdersData} />
+    </div>
+    <div ref={(el) => chartRefs.current[9] = el} className="bg-white p-4 rounded-xl shadow">
+      <DeliveryReportBarChart data={chartData.deliveryReportData} />
+    </div>
+  </div>
+</div>
+
                     </div>
                 )}
             </div>
@@ -323,7 +343,8 @@ const ClientDashboard = () => {
                 © {new Date().getFullYear()} EcoLogistics Dashboard.
             </footer>
         </div>
-    );
+  </>
+);
 };
 
 export default ClientDashboard;
