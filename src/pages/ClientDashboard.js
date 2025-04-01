@@ -247,12 +247,27 @@ const ClientDashboard = () => {
   <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-blue-600">
     <LineChart className="w-5 h-5" /> Cumplimiento
   </h3>
-  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-    <div ref={(el) => chartRefs.current[0] = el} className="bg-white p-4 rounded-xl shadow">
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {/* Gráfico de cumplimiento */}
+    <div
+      ref={(el) => (chartRefs.current[0] = el)}
+      className="bg-white p-4 rounded-xl shadow flex flex-col items-center justify-center"
+    >
       <CompliancePie data={chartData.complianceData} />
+    </div>
+
+    {/* Tarjeta visual para eliminar espacio vacío */}
+    <div className="bg-white p-4 rounded-xl shadow flex flex-col items-center justify-center text-center text-gray-600">
+      <p className="text-lg font-semibold text-green-700">¡Todo en orden! 🎯</p>
+      <p className="text-sm mt-1">
+        Todos los pedidos han sido despachados sin errores.
+      </p>
+      <div className="text-5xl mt-4">✅</div>
     </div>
   </div>
 </div>
+
 
     {/* Tendencias y Entregas */}
     <div>
@@ -341,7 +356,7 @@ const ClientDashboard = () => {
                     <Handshake className="w-5 h-5 text-gray-500" />
                     <span>Gracias por confiar en nosotros, <strong>{clientName}</strong>. Estamos a tu servicio.</span>
                 </div>
-                © {new Date().getFullYear()} EcoLogistics Dashboard.
+                © {new Date().getFullYear()} CEMEX Dashboard.
             </footer>
         </div>
   </>

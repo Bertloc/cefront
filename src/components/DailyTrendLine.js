@@ -12,30 +12,30 @@ const DailyTrendLine = ({ data }) => {
 
     return (
         <div 
-            className="mt-12 p-10 bg-white rounded-lg shadow-lg flex flex-col justify-center items-center"
+            className="mt-12 px-6 py-10 bg-white rounded-2xl shadow-xl"
             style={{ height: "500px", width: "100%" }}
         >
-            <h2 className="text-3xl font-bold text-center mb-2">Tendencia Diaria</h2>
-            <p className="text-center text-gray-600 mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-800">Tendencia Diaria</h2>
+            <p className="text-center text-sm md:text-base text-gray-500 mb-6">
                 Representación gráfica de la cantidad de productos entregados por fecha.
             </p>
             
             <ResponsiveLine
                 data={[{ id: 'Tendencia Diaria', data: formattedData }]}
-                margin={{ top: 50, right: 50, bottom: 70, left: 60 }}
-                xScale={{ type: 'time' }}
+                margin={{ top: 50, right: 40, bottom: 80, left: 60 }}
+                xScale={{ type: 'time', format: 'native' }}
                 xFormat="time:%d %b"
                 yScale={{ type: 'linear', min: 0, max: 'auto' }}
-                curve="natural"
+                curve="monotoneX"
                 axisTop={null}
                 axisRight={null}
                 axisBottom={{
                     orient: 'bottom',
                     format: '%d %b',
-                    tickValues: 'every 1 days',
+                    tickValues: 'every 3 days',
                     tickSize: 5,
-                    tickPadding: 10,
-                    tickRotation: -20,
+                    tickPadding: 8,
+                    tickRotation: -30,
                     legend: 'Fecha de Entrega',
                     legendOffset: 50,
                     legendPosition: 'middle'
@@ -50,7 +50,7 @@ const DailyTrendLine = ({ data }) => {
                     legendPosition: 'middle'
                 }}
                 enablePoints={true}
-                pointSize={10}
+                pointSize={8}
                 pointColor={{ theme: 'background' }}
                 pointBorderWidth={2}
                 pointBorderColor={{ from: 'serieColor' }}
@@ -59,8 +59,24 @@ const DailyTrendLine = ({ data }) => {
                 useMesh={true}
                 enableArea={true}
                 areaBlendMode="normal"
-                areaOpacity={0.3}
+                areaOpacity={0.25}
                 areaBaselineValue={0}
+                theme={{
+                    axis: {
+                        ticks: {
+                            text: {
+                                fontSize: 12,
+                                fill: '#555'
+                            }
+                        },
+                        legend: {
+                            text: {
+                                fontSize: 14,
+                                fill: '#333'
+                            }
+                        }
+                    }
+                }}
             />
         </div>
     );

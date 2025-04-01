@@ -2,6 +2,36 @@ import React from 'react';
 import { ResponsiveBar } from '@nivo/bar';
 
 const PendingOrdersBarChart = ({ data }) => {
+    if (data.length === 0 || data.every(item => item['Cantidad confirmada'] === 0)) {
+        return (
+            <div
+                style={{
+                    height: '400px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <div
+                    style={{
+                        backgroundColor: '#e6fffa',
+                        padding: '25px 40px',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        textAlign: 'center',
+                    }}
+                >
+                    <h2 style={{ color: '#0f5132', fontSize: '20px', fontWeight: 'bold', marginBottom: '10px' }}>
+                        Sin Pedidos Pendientes
+                    </h2>
+                    <p style={{ color: '#0f5132', fontSize: '15px' }}>
+                        Actualmente no hay materiales con pedidos pendientes por entregar. ✅
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div style={{ height: '400px' }}>
             <ResponsiveBar

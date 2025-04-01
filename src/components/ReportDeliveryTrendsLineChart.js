@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ResponsiveLine } from "@nivo/line";
 
@@ -8,85 +9,79 @@ const ReportDeliveryTrendsLineChart = ({ data }) => {
     }));
 
     return (
-        <div style={{
-            maxWidth: "550px", 
-            margin: "0 auto", 
-            padding: "20px", 
-            borderRadius: "20px", 
-            boxShadow: "0 4px 10px rgba(0,0,0,0.1)", 
-            backgroundColor: "#ffffff"
-        }}>
-            <h2 className="text-3xl font-bold text-center mb-2">Tendencias de Entrega</h2>
-            <p className="text-center text-gray-600 mb-6">
-                Representación gráfica de la cantidad de productos entregados por fecha.
+        <div className="mt-12 p-10 bg-white rounded-xl shadow-lg flex flex-col items-center"
+            style={{ height: "520px", width: "100%" }}>
+            <h2 className="text-3xl font-bold text-center mb-2 text-indigo-700">Tendencias de Entrega</h2>
+            <p className="text-center text-gray-600 mb-6 text-sm max-w-2xl">
+                Representación gráfica del comportamiento de las entregas a lo largo del tiempo.
             </p>
 
-            {/* Gráfico de línea */}
-            <div style={{ height: "400px" }}>
-                <ResponsiveLine
-                    data={[{ id: 'Tendencias de Entrega', data: formattedData }]}
-                    margin={{ top: 50, right: 60, bottom: 60, left: 60 }}
-                    xScale={{ type: 'point' }}
-                    yScale={{ type: 'linear', min: 'auto', max: 'auto' }}
-                    axisBottom={{
-                        orient: 'bottom',
-                        tickSize: 5,
-                        tickPadding: 5,
-                        tickRotation: -20,
-                        legend: 'Fecha de Entrega',
-                        legendOffset: 45,
-                        legendPosition: 'middle'
-                    }}
-                    axisLeft={{
-                        orient: 'left',
-                        tickSize: 5,
-                        tickPadding: 5,
-                        tickRotation: 0,
-                        legend: 'Cantidad Entregada',
-                        legendOffset: -50,
-                        legendPosition: 'middle'
-                    }}
-                    lineWidth={2}
-                    colors={{ scheme: 'set2' }}
-                    pointSize={8}
-                    pointColor={{ theme: 'background' }}
-                    pointBorderWidth={2}
-                    pointBorderColor={{ from: 'serieColor' }}
-                    pointLabelYOffset={-12}
-                    enableArea={true}
-                    areaOpacity={0.15}
-                    useMesh={true}
-                    tooltip={({ point }) => (
-                        <div style={{
-                            padding: "5px 10px",
-                            background: "#fff",
-                            border: "1px solid #ccc",
-                            borderRadius: "5px",
-                            boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
-                        }}>
-                            <strong>{point.data.x}: {point.data.y}</strong>
-                        </div>
-                    )}
-                />
-            </div>
-
-            {/* Leyenda del gráfico */}
-            <div style={{ textAlign: 'center', marginTop: '20px' }}>
-                <div style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    fontWeight: 'bold'
-                }}>
+            <ResponsiveLine
+                data={[{ id: 'Entregas', data: formattedData }]}
+                margin={{ top: 40, right: 30, bottom: 70, left: 60 }}
+                xScale={{ type: 'point' }}
+                yScale={{ type: 'linear', min: 0, max: 'auto' }}
+                curve="monotoneX"
+                axisTop={null}
+                axisRight={null}
+                axisBottom={{
+                    orient: 'bottom',
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: -20,
+                    legend: 'Fecha de Entrega',
+                    legendOffset: 50,
+                    legendPosition: 'middle'
+                }}
+                axisLeft={{
+                    orient: 'left',
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legend: 'Cantidad Entregada',
+                    legendOffset: -50,
+                    legendPosition: 'middle'
+                }}
+                lineWidth={3}
+                colors={['#7c3aed']}
+                pointSize={10}
+                pointColor="#ffffff"
+                pointBorderWidth={3}
+                pointBorderColor="#7c3aed"
+                enablePointLabel={false}
+                useMesh={true}
+                areaOpacity={0.25}
+                enableArea={true}
+                areaBaselineValue={0}
+                tooltip={({ point }) => (
                     <div style={{
-                        width: '15px',
-                        height: '15px',
-                        backgroundColor: '#66c2a5',
-                        borderRadius: '50%'
-                    }}></div>
-                    Tendencias de Entrega
-                </div>
-            </div>
+                        padding: "6px 12px",
+                        background: "#fff",
+                        border: "1px solid #ccc",
+                        borderRadius: "6px",
+                        fontSize: "13px",
+                        boxShadow: "0 2px 5px rgba(0,0,0,0.15)"
+                    }}>
+                        <strong>{point.data.x}</strong><br />
+                        {point.data.y} entregas
+                    </div>
+                )}
+                theme={{
+                    axis: {
+                        ticks: {
+                            text: { fontSize: 12, fill: "#444" },
+                        },
+                        legend: {
+                            text: { fontSize: 14, fill: "#333" },
+                        }
+                    },
+                    tooltip: {
+                        container: {
+                            fontSize: 12
+                        }
+                    }
+                }}
+            />
         </div>
     );
 };
