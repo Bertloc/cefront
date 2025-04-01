@@ -244,69 +244,69 @@ const ClientDashboard = () => {
   <div className="space-y-10 px-4">
     {/* Cumplimiento */}
     <div>
-      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-blue-600">
-        <LineChart className="w-5 h-5" /> Cumplimiento
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
-        <div ref={(el) => (chartRefs.current[0] = el)} className="bg-white p-4 rounded-xl shadow">
-          <CompliancePie data={chartData.complianceData} />
-        </div>
-      </div>
+  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-blue-600">
+    <LineChart className="w-5 h-5" /> Cumplimiento
+  </h3>
+  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+    <div ref={(el) => chartRefs.current[0] = el} className="bg-white p-4 rounded-xl shadow">
+      <CompliancePie data={chartData.complianceData} />
     </div>
+  </div>
+</div>
 
     {/* Tendencias y Entregas */}
     <div>
-      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-emerald-600">
-        <LineChart className="w-5 h-5" /> Tendencias y Entregas
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
-        <div ref={(el) => (chartRefs.current[1] = el)} className="bg-white p-4 rounded-xl shadow">
-          <DailyTrendLine data={chartData.dailyTrendData} />
-        </div>
-        <div ref={(el) => (chartRefs.current[2] = el)} className="bg-white p-4 rounded-xl shadow">
-          <MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />
-        </div>
-        <div ref={(el) => (chartRefs.current[8] = el)} className="bg-white p-4 rounded-xl shadow">
-          <ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />
-        </div>
-        <div ref={(el) => (chartRefs.current[7] = el)} className="bg-white p-4 rounded-xl shadow">
-          <DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />
-        </div>
-      </div>
+  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-emerald-600">
+    <LineChart className="w-5 h-5" /> Tendencias y Entregas
+  </h3>
+  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+    <div ref={(el) => chartRefs.current[1] = el} className="bg-white p-4 rounded-xl shadow">
+      <DailyTrendLine data={chartData.dailyTrendData} />
     </div>
+    <div ref={(el) => chartRefs.current[2] = el} className="bg-white p-4 rounded-xl shadow">
+      <MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />
+    </div>
+    <div ref={(el) => chartRefs.current[8] = el} className="bg-white p-4 rounded-xl shadow">
+      <ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />
+    </div>
+    <div ref={(el) => chartRefs.current[7] = el} className="bg-white p-4 rounded-xl shadow">
+      <DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />
+    </div>
+  </div>
+</div>
 
     {/* Distribución y Categorías */}
     <div>
-      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-pink-600">
-        <LineChart className="w-5 h-5" /> Distribución y Categorías
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
-        <div ref={(el) => (chartRefs.current[3] = el)} className="bg-white p-4 rounded-xl shadow">
-          <DistributionByCenterPieChart data={chartData.distributionByCenterData} />
-        </div>
-        <div ref={(el) => (chartRefs.current[6] = el)} className="bg-white p-4 rounded-xl shadow">
-          <ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />
-        </div>
-      </div>
+  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-pink-600">
+    <LineChart className="w-5 h-5" /> Distribución y Categorías
+  </h3>
+  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+    <div ref={(el) => chartRefs.current[3] = el} className="bg-white p-4 rounded-xl shadow">
+      <DistributionByCenterPieChart data={chartData.distributionByCenterData} />
     </div>
+    <div ref={(el) => chartRefs.current[6] = el} className="bg-white p-4 rounded-xl shadow">
+      <ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />
+    </div>
+  </div>
+</div>
 
     {/* Resúmenes y Pedidos Pendientes */}
     <div>
-      <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-orange-600">
-        <LineChart className="w-5 h-5" /> Resúmenes y Pedidos Pendientes
-      </h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
-        <div ref={(el) => (chartRefs.current[4] = el)} className="bg-white p-4 rounded-xl shadow">
-          <DailySummaryLineChart data={chartData.dailySummaryData} />
-        </div>
-        <div ref={(el) => (chartRefs.current[5] = el)} className="bg-white p-4 rounded-xl shadow">
-          <PendingOrdersBarChart data={chartData.pendingOrdersData} />
-        </div>
-        <div ref={(el) => (chartRefs.current[9] = el)} className="bg-white p-4 rounded-xl shadow">
-          <DeliveryReportBarChart data={chartData.deliveryReportData} />
-        </div>
-      </div>
+  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-orange-600">
+    <LineChart className="w-5 h-5" /> Resúmenes y Pedidos Pendientes
+  </h3>
+  <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+    <div ref={(el) => chartRefs.current[4] = el} className="bg-white p-4 rounded-xl shadow">
+      <DailySummaryLineChart data={chartData.dailySummaryData} />
     </div>
+    <div ref={(el) => chartRefs.current[5] = el} className="bg-white p-4 rounded-xl shadow">
+      <PendingOrdersBarChart data={chartData.pendingOrdersData} />
+    </div>
+    <div ref={(el) => chartRefs.current[9] = el} className="bg-white p-4 rounded-xl shadow">
+      <DeliveryReportBarChart data={chartData.deliveryReportData} />
+    </div>
+  </div>
+</div>
   </div>
 )}
 
