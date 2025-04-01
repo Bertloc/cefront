@@ -260,7 +260,7 @@ const UploadPage = () => {
 
       {/* Footer */}
       <footer className="text-center text-sm text-gray-500 mt-12 py-6">
-        © {new Date().getFullYear()} EcoLogistics Dashboard. Hecho con 💙 para el equipo logístico.
+        © {new Date().getFullYear()} CEMEX Dashboard. Hecho con 💙 para el equipo logístico.
       </footer>
     </div>
   );
