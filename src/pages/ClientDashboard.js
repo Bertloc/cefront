@@ -232,7 +232,7 @@ const ClientDashboard = () => {
                 </div>
 
                 <div className="text-center text-gray-600 text-sm mb-10">
-                    De <span className="font-semibold">{totalPedidos}</span> pedidos programados, <span className="font-semibold">{entregados}</span> fueron entregados exitosamente.
+                    De <span className="font-semibold">{totalPedidos}</span> pedidos programados, <span className="font-semibold">{entregados}</span> toneladas fueron entregados exitosamente.
                     {pendientes > 0 ? " Aún hay pedidos pendientes por entregar." : " ¡Operación sin fallos! 🎯"}
                 </div>
 
