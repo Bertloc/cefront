@@ -113,3 +113,28 @@ body {
     padding: 1rem;
   }
 }
+
+/* -----------------------------------
+   Summary Cards (3-column color cards)
+   ----------------------------------- */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: 0.75rem;  /* igual que rounded-xl */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  color: #ffffff;
+}
+
+/* Colores extraídos de la muestra */
+.summary-card-blue  { background-color: #2A609E; }  /* Total Pedidos */
+.summary-card-green { background-color: #10BE8C; }  /* Entregados */
+.summary-card-red   { background-color: #FD6B4C; }  /* % Cumplimiento */

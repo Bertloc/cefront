@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import { UserCircle, HelpCircle, FileDown, LineChart, ThumbsUp, Handshake, Building2 } from "lucide-react";
+import { UserCircle, HelpCircle, FileDown, LineChart, ThumbsUp, Handshake, Building2 , Truck, Percent} from "lucide-react";
 import CompliancePie from "../components/CompliancePie";
 import DailyTrendLine from "../components/DailyTrendLine";
 import MonthlyProductAllocationBarChart from "../components/MonthlyProductAllocationBarChart";
@@ -195,6 +195,8 @@ const ClientDashboard = () => {
       </div>
     </div>
 
+  
+
 <div className="min-h-screen bg-gray-100 py-8 px-4 flex flex-col justify-between">
             <div>
                 <div className="text-center mb-6">
@@ -231,24 +233,29 @@ const ClientDashboard = () => {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 px-4">
-                    <div className="bg-white rounded-xl shadow p-4 text-center">
-                        <p className="text-sm text-gray-500">Total Pedidos</p>
-                        <p className="text-xl font-bold">{totalPedidos}</p>
+                <div className="summary-cards">
+                    <div className="summary-card summary-card-blue">
+                      <Building2 size={28} />
+                      <div className="text-right">
+                        <p className="text-sm uppercase tracking-wide">Total Pedidos</p>
+                        <p className="text-3xl font-bold">{totalPedidos}</p>
+                      </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow p-4 text-center">
-                        <p className="text-sm text-gray-500">Entregados</p>
-                        <p className="text-xl font-bold">{entregados}</p>
+                    <div className="summary-card summary-card-green">
+                      <Truck size={28} />
+                      <div className="text-right">
+                        <p className="text-sm uppercase tracking-wide">Entregados</p>
+                        <p className="text-3xl font-bold">{entregados}</p>
+                      </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow p-4 text-center">
-                        <p className="text-sm text-gray-500">Pendientes</p>
-                        <p className="text-xl font-bold">{pendientes}</p>
+                    <div className="summary-card summary-card-red">
+                      <Percent size={28} />
+                      <div className="text-right">
+                        <p className="text-sm uppercase tracking-wide">% Cumplimiento</p>
+                        <p className="text-3xl font-bold">{cumplimiento}%</p>
+                      </div>
                     </div>
-                    <div className="bg-white rounded-xl shadow p-4 text-center">
-                        <p className="text-sm text-gray-500">% Cumplimiento</p>
-                        <p className="text-xl font-bold">{cumplimiento}%</p>
-                    </div>
-                </div>
+                  </div>
 
                 <div className="text-center text-gray-600 text-sm mb-10">
                     De <span className="font-semibold">{totalPedidos}</span> pedidos programados, <span className="font-semibold">{entregados}</span> toneladas fueron entregados exitosamente.
