@@ -1,3 +1,4 @@
+import './ClientDashboard.css';
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -162,6 +163,24 @@ const ClientDashboard = () => {
     }[colorTheme];
 
     return (
+
+<div className="cemex-layout">
+  <aside className="sidebar">
+    <div className="sidebar-header">
+      <img src="/cemex-logo.png" alt="Cemex Logo" className="logo" />
+    </div>
+    <nav className="sidebar-nav">
+      <a href="#" className="nav-item">Dashboard</a>
+      <a href="#" className="nav-item">Entregas</a>
+      <a href="#" className="nav-item">Estadísticas</a>
+      <a href="#" className="nav-item">Reporte</a>
+    </nav>
+    <div className="sidebar-footer">
+      <button className="logout-btn">⏻</button>
+    </div>
+  </aside>
+
+  <main className="dashboard-main">
   <>
   
     <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl shadow mb-6">
@@ -360,10 +379,15 @@ const ClientDashboard = () => {
             </footer>
         </div>
   </>
+
+  </main>
+</div>
 );
 };
 
 export default ClientDashboard;
                            
+
+
 
 
