@@ -1,140 +1,396 @@
-
 /* ===== CEMEX DASHBOARD STYLES ===== */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f5f7fa;
+  background-color: #f3f4f6; /* Fondo general más claro */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .cemex-layout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh; /* Asegura que al menos cubra la altura de la pantalla */
 }
 
+/* -----------------------------------
+ Sidebar
+ ----------------------------------- */
 .sidebar {
-  width: 240px;
-  background-color: #002d72;
-  color: white;
+  width: 260px; /* Un poco más ancho para mejor legibilidad */
+  background-color: #0F172A; /* Azul oscuro */
+  color: #cbd5e1; /* Gris más claro para el texto */
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 1.5rem 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sutil sombra */
+  z-index: 10; /* Asegura que esté por encima del contenido principal */
 }
 
 .sidebar-header {
-  text-align: center;
-  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.5rem 0;
+  margin-bottom: 1rem;
 }
 
 .sidebar-header .logo {
   width: 120px;
   height: auto;
+  margin: 0 auto;
+  display: block;
+  transition: opacity 0.2s ease-in-out, transform 0.15s ease;
 }
 
+.sidebar-header .logo:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+}
+
+.sidebar-header .logo:active {
+  transform: scale(0.97); /* efecto de clic */
+}
+
+
 .sidebar-nav {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  margin-top: 1rem;
 }
 
 .nav-item {
-  color: white;
+  display: flex;
+  align-items: center;
+  color: #cbd5e1;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
   text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  transition: background-color 0.3s ease;
+  border-radius: 0.375rem; /* Bordes redondeados */
+  transition: all 0.2s ease-in-out;
 }
 
-.nav-item:hover {
-  background-color: #e30613;
+.nav-item:hover,
+.nav-item.active {
+  background-color: #1E293B; /* Un poco más claro al pasar el mouse */
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1); /* Borde sutil al hacer hover */
+}
+
+.nav-item svg {
+  margin-right: 0.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  opacity: 0.7;
 }
 
 .sidebar-footer {
-  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #4b5563; /* Línea separadora */
 }
 
-.logout-btn {
-  background: #e30613;
+.download-btn {
+  background-color: #4338CA; /* Morado */
   color: white;
+  padding: 0.6rem 1rem;
   border: none;
-  padding: 0.6rem 0.75rem;
-  border-radius: 50%;
-  font-size: 1.1rem;
+  border-radius: 0.375rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  transition: background-color 0.2s ease-in-out;
 }
 
-.logout-btn:hover {
-  background: #b5000f;
+.download-btn:hover {
+  background-color: #4F46E5; /* Morado más claro al hover */
 }
 
+.download-btn svg {
+  margin-right: 0.5rem;
+}
+
+/* -----------------------------------
+ Main Content
+ ----------------------------------- */
 .dashboard-main {
   flex-grow: 1;
   padding: 2rem;
   overflow-y: auto;
 }
 
-.dashboard-title {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  color: #002d72;
+/* -----------------------------------
+ Header principal
+ ----------------------------------- */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.dashboard-graphs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 2rem;
+.dashboard-header .titles h2 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;   /* font-bold */
+  color: #111827;     /* gray-900 */
+  margin-bottom: 0.25rem;
 }
 
-/* Responsive tweaks */
-@media (max-width: 768px) {
-  .cemex-layout {
-    flex-direction: column;
-  }
+.dashboard-header .titles p {
+  font-size: 1.125rem; /* text-lg */
+  color: #4b5563;     /* gray-600 */
+}
 
-  .sidebar {
-    flex-direction: row;
-    flex-wrap: wrap;
-    height: auto;
-    width: 100%;
-    padding: 1rem;
-  }
+.client-info {
+  display: flex;
+  align-items: center;
+}
 
-  .sidebar-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem;
-  }
+.client-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  margin-right: 1rem;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #6b7280;
+}
 
-  .dashboard-main {
-    padding: 1rem;
-  }
+.client-info h3 {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600;   /* font-semibold */
+  color: #374151;     /* gray-700 */
+  margin: 0;
+}
+
+.client-info p {
+  font-size: 0.875rem; /* text-sm */
+  color: #6b7280;     /* gray-500 */
+  margin: 0;
 }
 
 /* -----------------------------------
-   Summary Cards (3-column color cards)
-   ----------------------------------- */
+ Summary Cards
+ ----------------------------------- */
 .summary-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin: 1.5rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .summary-card {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  border-radius: 0.75rem;  /* igual que rounded-xl */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  color: #ffffff;
 }
 
-/* Colores extraídos de la muestra */
-.summary-card-blue  { background-color: #2A609E; }  /* Total Pedidos */
-.summary-card-green { background-color: #10BE8C; }  /* Entregados */
-.summary-card-red   { background-color: #FD6B4C; }  /* % Cumplimiento */
+.summary-card svg {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #6b7280;
+  opacity: 0.7;
+}
+
+.summary-card .text-right p:first-child {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-bottom: 0.25rem;
+}
+
+.summary-card .text-right p:last-child {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.summary-card-blue {
+  border-left: 4px solid #2563eb;
+}
+
+.summary-card-green {
+  border-left: 4px solid #10b981;
+}
+
+.summary-card-red {
+  border-left: 4px solid #dc2626;
+}
+
+/* -----------------------------------
+ Graphs
+ ----------------------------------- */
+.dashboard-graphs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.graph-container {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.graph-container h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+/* -----------------------------------
+ Help Modal
+ ----------------------------------- */
+.help-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.help-content {
+  background-color: white;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  max-width: 600px;
+  width: 90%;
+}
+
+.help-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.help-content ul {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #4b5563;
+}
+
+.close-help-btn {
+  background-color: #6b7280;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.close-help-btn:hover {
+  background-color: #4b5563;
+}
+
+/* -----------------------------------
+ Help Button
+ ----------------------------------- */
+.help-button {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  background-color: #3b82f6; /* Blue-500 */
+  color: white;
+  width: 48px;  /* Ajustado para ser cuadrado */
+  height: 48px; /* Ajustado para ser cuadrado */
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  z-index: 30;
+  border: none;
+}
+
+.help-button:hover {
+  background-color: #2563eb; /* Blue-600 */
+}
+
+
+/* -----------------------------------
+ Responsive Design
+ ----------------------------------- */
+@media (max-width: 768px) {
+  .cemex-layout {
+      flex-direction: column;
+  }
+
+  .sidebar {
+      width: 100%;
+      height: auto;
+      flex-direction: row;
+      align-items: center;
+      overflow-x: auto;
+      padding: 0.5rem;
+  }
+
+  .sidebar-header {
+      margin-bottom: 0.5rem;
+  }
+
+  .sidebar-nav {
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+  }
+
+  .nav-item {
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+      margin-bottom: 0;
+  }
+
+  .sidebar-footer {
+      padding-top: 0.5rem;
+      border-top: none;
+  }
+
+  .download-btn {
+      width: auto;
+      padding: 0.5rem;
+      margin-left: auto;
+  }
+
+  .dashboard-main {
+      padding: 1rem;
+  }
+
+  .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+  }
+
+  .dashboard-header .titles {
+      margin-bottom: 0.5rem;
+  }
+
+  .summary-cards {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+  }
+
+  .dashboard-graphs {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+  }
+}

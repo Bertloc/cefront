@@ -1,10 +1,11 @@
+import cemexLogo from '../assets/images/logo-cemex.png';
 import './ClientDashboard.css';
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import { UserCircle, HelpCircle, FileDown, LineChart, ThumbsUp, Handshake, Building2 , Truck, Percent} from "lucide-react";
+import {UserCircle, HelpCircle, FileDown, LineChart, ThumbsUp, Handshake, Building2, Truck, Percent, Download, Sun} from "lucide-react";
 import CompliancePie from "../components/CompliancePie";
 import DailyTrendLine from "../components/DailyTrendLine";
 import MonthlyProductAllocationBarChart from "../components/MonthlyProductAllocationBarChart";
@@ -167,7 +168,14 @@ const ClientDashboard = () => {
 <div className="cemex-layout">
   <aside className="sidebar">
     <div className="sidebar-header">
-      <img src="/cemex-logo.png" alt="Cemex Logo" className="logo" />
+    <a href="#dashboard">
+    <img
+  src={cemexLogo}
+  alt="Cemex Logo"
+  className="hover:opacity-80 transition duration-200 ease-in-out w-[120px] mx-auto"
+/>
+
+  </a>
     </div>
     <nav className="sidebar-nav">
       <a href="#" className="nav-item">Dashboard</a>
@@ -183,21 +191,18 @@ const ClientDashboard = () => {
   <main className="dashboard-main">
   <>
   
-    <div className="flex items-center justify-between bg-slate-50 p-4 rounded-xl shadow mb-6">
-      <div className="flex items-center gap-4">
-        <UserCircle size={40} className="text-blue-600" />
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-800">
-            {clientName || "Cliente"}
-          </h1>
-          <p className="text-sm text-gray-500">Dashboard de entregas</p>
-        </div>
+    <div className="dashboard-header">
+      <div className="titles">
+        <h2>Dashboard del Cliente</h2>
+        <p>Bienvenido, {clientName}</p>
       </div>
+      <button className="btn-export" onClick={exportToPDF}>
+        <Download size={18} className="mr-2" />
+        Exportar a PDF
+      </button>
     </div>
 
-  
-
-<div className="min-h-screen bg-gray-100 py-8 px-4 flex flex-col justify-between">
+    <div className="min-h-screen bg-gray-100 py-8 px-4 flex flex-col justify-between">
             <div>
                 <div className="text-center mb-6">
                     <h1 className="text-2xl sm:text-3xl font-bold flex justify-center items-center gap-2">
@@ -234,30 +239,30 @@ const ClientDashboard = () => {
                 </div>
 
                 <div className="summary-cards">
-                    <div className="summary-card summary-card-blue">
-                      <Building2 size={28} />
-                      <div className="text-right">
-                        <p className="text-sm uppercase tracking-wide">Total Pedidos</p>
-                        <p className="text-3xl font-bold">{totalPedidos}</p>
-                      </div>
-                    </div>
-                    <div className="summary-card summary-card-green">
-                      <Truck size={28} />
-                      <div className="text-right">
-                        <p className="text-sm uppercase tracking-wide">Entregados</p>
-                        <p className="text-3xl font-bold">{entregados}</p>
-                      </div>
-                    </div>
-                    <div className="summary-card summary-card-red">
-                      <Percent size={28} />
-                      <div className="text-right">
-                        <p className="text-sm uppercase tracking-wide">% Cumplimiento</p>
-                        <p className="text-3xl font-bold">{cumplimiento}%</p>
-                      </div>
-                    </div>
-                  </div>
+  <div className="summary-card summary-card-blue">
+    <Building2 size={28} />
+    <div className="text-right">
+      <p className="text-sm uppercase tracking-wide">Total Pedidos</p>
+      <p className="text-3xl font-bold">{totalPedidos}</p>
+    </div>
+  </div>
+  <div className="summary-card summary-card-green">
+    <Truck size={28} />
+    <div className="text-right">
+      <p className="text-sm uppercase tracking-wide">Entregados</p>
+      <p className="text-3xl font-bold">{entregados}</p>
+    </div>
+  </div>
+  <div className="summary-card summary-card-red">
+    <Percent size={28} />
+    <div className="text-right">
+      <p className="text-sm uppercase tracking-wide">% Cumplimiento</p>
+      <p className="text-3xl font-bold">{cumplimiento}%</p>
+    </div>
+  </div>
+</div>
 
-                <div className="text-center text-gray-600 text-sm mb-10">
+<div className="text-center text-gray-600 text-sm mb-10">
                     De <span className="font-semibold">{totalPedidos}</span> pedidos programados, <span className="font-semibold">{entregados}</span> toneladas fueron entregados exitosamente.
                     {pendientes > 0 ? " Aún hay pedidos pendientes por entregar." : " ¡Operación sin fallos! 🎯"}
                 </div>
@@ -394,7 +399,3 @@ const ClientDashboard = () => {
 
 export default ClientDashboard;
                            
-
-
-
-
