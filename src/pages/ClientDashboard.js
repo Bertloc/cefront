@@ -3,8 +3,6 @@ import './ClientDashboard.css';
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
 import {
   UserCircle, HelpCircle, FileDown, LineChart, ThumbsUp, Handshake,
   Building2, Truck, Percent, Download
@@ -19,6 +17,8 @@ import ProductCategorySummaryPieChart from "../components/ProductCategorySummary
 import DailyDeliveryReportLineChart from "../components/DailyDeliveryReportLineChart";
 import ReportDeliveryTrendsLineChart from "../components/ReportDeliveryTrendsLineChart";
 import DeliveryReportBarChart from "../components/DeliveryReportBarChart";
+import PDFDashboardPanel from "./PDFDashboardPanel";
+import { exportDashboardPDFfromPanel } from "../utils/exportPDF";
 
 const API_URL = "https://backend-processing.onrender.com/api";
 
@@ -115,6 +115,43 @@ const CHART_CARD_META = [
   }
 ];
 
+const graphTitles = [
+  "Cumplimiento General",
+  "Tendencia Diaria",
+  "Asignación Mensual de Producto",
+  "Distribución por Centro",
+  "Resumen Diario de Aprovechamiento",
+  "Pedidos Pendientes",
+  "Resumen por Categoría de Producto",
+  "Reporte Diario de Entregas",
+  "Tendencias de Entrega",
+  "Reporte de Entrega"
+];
+const graphSubtitles = [
+  "Representación del cumplimiento de los pedidos con base en su estado.",
+  "Productos entregados por fecha.",
+  "Cantidad de productos asignados por mes.",
+  "Entregas por centro logístico.",
+  "Porcentaje de aprovechamiento diario.",
+  "Pedidos aún por entregar.",
+  "Porcentaje por tipo de producto.",
+  "Entregas totales cada día.",
+  "Comportamiento de entregas a lo largo del tiempo.",
+  "Detalle de entregas por reporte."
+];
+const graphLegends = [
+  "Despachado vs Total de pedidos",
+  "Eje Y: Toneladas entregadas • Eje X: Fecha de entrega",
+  "Eje Y: Cantidad asignada • Eje X: Mes",
+  "Eje Y: Toneladas • Eje X: Centro",
+  "Eje Y: % aprovechamiento • Eje X: Fecha",
+  "Eje Y: Pedidos • Eje X: Material",
+  "Eje Y: % entregado • Eje X: Categoría",
+  "Eje Y: Cantidad entregada • Eje X: Fecha",
+  "Eje Y: Entregas • Eje X: Fecha",
+  "Eje Y: Cantidad • Eje X: Reporte"
+];
+
 const ClientDashboard = () => {
   const { clientId } = useParams();
   const [loading, setLoading] = useState(true);
@@ -136,11 +173,15 @@ const ClientDashboard = () => {
     deliveryReportData: []
   });
 
+  // Ref para PDF panel
+  const pdfPanelRef = useRef();
+
   useEffect(() => {
     if (clientId) {
       fetchAllChartData();
       fetchClientName();
     }
+    // eslint-disable-next-line
   }, [clientId]);
 
   const fetchClientName = async () => {
@@ -154,6 +195,7 @@ const ClientDashboard = () => {
       }
     } catch (err) {
       console.error("Error al obtener el nombre del cliente:", err);
+      setClientName("Cliente");
     }
   };
 
@@ -211,31 +253,6 @@ const ClientDashboard = () => {
     }
   };
 
-  const exportToPDF = async () => {
-    const pdf = new jsPDF("p", "mm", "a4");
-    const margin = 10;
-    const imgWidth = 90;
-    const imgHeight = 70;
-    let positionX = margin;
-    let positionY = margin;
-    const charts = chartRefs.current.filter(el => el !== null);
-
-    for (let i = 0; i < charts.length; i++) {
-      const canvas = await html2canvas(charts[i], { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-      pdf.addImage(imgData, "PNG", positionX, positionY, imgWidth, imgHeight);
-      positionX = positionX === margin ? positionX + imgWidth + 10 : margin;
-      positionY = positionX === margin ? positionY + imgHeight + 10 : positionY;
-      if (positionY + imgHeight >= 270) {
-        pdf.addPage();
-        positionX = margin;
-        positionY = margin;
-      }
-    }
-
-    pdf.save(`dashboard_cliente_${clientId}.pdf`);
-  };
-
   const cumplimiento = (() => {
     const despachado = chartData.complianceData.find(d => d.id === "Despachado")?.value || 0;
     const total = chartData.complianceData.reduce((sum, d) => sum + d.value, 0);
@@ -252,11 +269,10 @@ const ClientDashboard = () => {
     green: "bg-green-600"
   }[colorTheme];
 
-  const hoverColor = {
-    blue: "hover:bg-blue-700",
-    gray: "hover:bg-gray-800",
-    green: "hover:bg-green-700"
-  }[colorTheme];
+  // PDF EXPORT: usa el panel oculto y el ref
+  const exportPDFHandler = () => {
+    exportDashboardPDFfromPanel(pdfPanelRef);
+  };
 
   return (
     <div className="cemex-layout">
@@ -288,7 +304,7 @@ const ClientDashboard = () => {
             <h2>Dashboard del Cliente</h2>
             <p>Bienvenido, {clientName}</p>
           </div>
-          <button className="btn-export glass-btn" onClick={exportToPDF}>
+          <button className="btn-export glass-btn" onClick={exportPDFHandler}>
             <Download size={18} className="mr-2" />
             Exportar a PDF
           </button>
@@ -480,6 +496,39 @@ const ClientDashboard = () => {
             © {new Date().getFullYear()} CEMEX Dashboard.
           </footer>
         </div>
+
+        {/* Panel oculto para PDF */}
+        <div
+  style={{
+    position: "absolute",
+    left: "-9999px",
+    top: 0,
+    visibility: "visible",
+    width: "794px",             // ancho A4 a 96dpi
+    minHeight: "1123px", 
+    background: "#fff",
+    zIndex: -1
+  }}
+>
+  <PDFDashboardPanel
+    ref={pdfPanelRef}
+    clientName={clientName}
+    fecha={new Date().toLocaleDateString()}
+    pedidos={totalPedidos}
+    entregas={entregados}
+    cumplimiento={cumplimiento}
+    complianceChart={<CompliancePie data={chartData.complianceData} />}
+    dailyTrendChart={<DailyTrendLine data={chartData.dailyTrendData} />}
+    monthlyProductChart={<MonthlyProductAllocationBarChart data={chartData.monthlyProductData} />}
+    distributionChart={<DistributionByCenterPieChart data={chartData.distributionByCenterData} />}
+    dailySummaryChart={<DailySummaryLineChart data={chartData.dailySummaryData} />}
+    pendingOrdersChart={<PendingOrdersBarChart data={chartData.pendingOrdersData} />}
+    productCategoryChart={<ProductCategorySummaryPieChart data={chartData.productCategorySummaryData} />}
+    dailyDeliveryReportChart={<DailyDeliveryReportLineChart data={chartData.dailyDeliveryReportData} />}
+    reportDeliveryTrendsChart={<ReportDeliveryTrendsLineChart data={chartData.reportDeliveryTrendsData} />}
+    deliveryReportChart={<DeliveryReportBarChart data={chartData.deliveryReportData} />}
+  />
+</div>
       </main>
     </div>
   );
